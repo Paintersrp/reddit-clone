@@ -5,7 +5,7 @@ import AuthForm from "./AuthForm";
 
 const SignIn: FC = ({}) => {
   return (
-    <div className="container mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[400px]">
+    <div className="container mx-auto flex w-full flex-col justify-center space-y-6">
       <div className="flex flex-col space-y-2 text-center">
         <Icons.Logo className="mx-auto h-7 w-7" />
         <h1 className="text-2xl font-semibold tracking-tight">Welcome back</h1>
