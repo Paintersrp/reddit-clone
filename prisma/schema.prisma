@@ -1,0 +1,150 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id              String    @id @default(cuid())
+  name            String?
+  email           String?   @unique
+  emailVerified   DateTime?
+  createdSubhives Subhive[] @relation("CreatedBy")
+
+  username     String?        @unique
+  image        String?
+  accounts     Account[]
+  sessions     Session[]
+  Thread       Thread[]
+  Comment      Comment[]
+  CommentVote  CommentVote[]
+  Vote         Vote[]
+  Subhive      Subhive[]
+  Subscription Subscription[]
+}
+
+model Subhive {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  threads Thread[]
+
+  creator     User?          @relation("CreatedBy", fields: [creatorId], references: [id])
+  creatorId   String?
+  subscribers Subscription[]
+  User        User?          @relation(fields: [userId], references: [id])
+  userId      String?
+
+  @@index([name])
+}
+
+model Subscription {
+  user      User    @relation(fields: [userId], references: [id])
+  userId    String
+  subhive   Subhive @relation(fields: [subhiveId], references: [id])
+  subhiveId String
+
+  @@id([userId, subhiveId])
+}
+
+model Thread {
+  id        String   @id @default(cuid())
+  title     String
+  content   Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  subhive   Subhive @relation(fields: [subhiveId], references: [id])
+  subhiveId String
+
+  author   User   @relation(fields: [authorId], references: [id])
+  authorId String
+
+  comments Comment[]
+  votes    Vote[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  text      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author   User   @relation(fields: [authorId], references: [id])
+  authorId String
+
+  thread   Thread @relation(fields: [threadId], references: [id])
+  threadId String
+
+  replyToId String?
+  replyTo   Comment?  @relation("ReplyTo", fields: [replyToId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies   Comment[] @relation("ReplyTo")
+
+  votes     CommentVote[]
+  commentId String?
+}
+
+enum VoteType {
+  UP
+  DOWN
+}
+
+model Vote {
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  thread   Thread @relation(fields: [threadId], references: [id])
+  threadId String
+
+  type VoteType
+
+  @@id([userId, threadId])
+}
+
+model CommentVote {
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  comment   Comment @relation(fields: [commentId], references: [id])
+  commentId String
+
+  type VoteType
+
+  @@id([userId, commentId])
+}
