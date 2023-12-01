@@ -1,0 +1,1 @@
+export const INFINITE_SCROLLING_PER_PAGE = 5
