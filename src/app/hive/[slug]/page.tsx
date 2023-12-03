@@ -5,6 +5,7 @@ import { getAuthSession } from "@/lib/auth";
 import { INFINITE_SCROLLING_PER_PAGE } from "@/config";
 
 import CreateThread from "@/components/CreateThread";
+import ThreadFeed from "@/components/ThreadFeed";
 
 interface PageProps {
   params: {
@@ -42,6 +43,7 @@ const Page = async ({ params }: PageProps) => {
       </h1>
 
       <CreateThread session={session} />
+      <ThreadFeed initialThreads={subhive.threads} subhiveName={subhive.name} />
     </div>
   );
 };

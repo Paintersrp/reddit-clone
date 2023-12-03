@@ -1,6 +1,11 @@
-import { Button } from "@/components/ui/Button";
+import { notFound } from "next/navigation";
+import { format } from "date-fns";
+
+import { Button, buttonVariants } from "@/components/ui/Button";
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
+import SubscribeLeaveToggle from "@/components/SubscribeLeaveToggle";
+import Link from "next/link";
 
 const Layout = async ({
   children,
@@ -26,6 +31,31 @@ const Layout = async ({
     },
   });
 
+  const subscription = !session?.user
+    ? undefined
+    : await db.subscription.findFirst({
+        where: {
+          subhive: {
+            name: slug,
+          },
+          user: {
+            id: session.user.id,
+          },
+        },
+      });
+
+  const isSubscribed = !!subscription;
+
+  if (!subhive) return notFound();
+
+  const memberCount = await db.subscription.count({
+    where: {
+      subhive: {
+        name: slug,
+      },
+    },
+  });
+
   return (
     <div className="sm:container max-w-7xl mx-auto h-full pt-12">
       <div>
@@ -34,11 +64,52 @@ const Layout = async ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 md:gap-x-4 py-6">
           <div className="flex flex-col col-span-2 space-y-6">{children}</div>
 
-          {/* Info Sidebar */}
+          {/* Menu on mobile? */}
           <div className="hidden md:block overflow-hidden h-fit rounded-lg border border-gray-200 order-first md:order-last">
             <div className="px-6 py-4">
-              <p className="font-semibold py-3">About hive/{slug}</p>
+              <p className="font-semibold py-3">About hive/{subhive.name}</p>
             </div>
+
+            <dl className="divide-y divide-gray-100 px-6 py-4 text-sm lreading-6 bg-white">
+              <div className="flex justify-between gap-x-4 py-3">
+                <dt className="text-gray-500">Created</dt>
+                <dd className="text-gray-700">
+                  <time dateTime={subhive.createdAt.toDateString()}>
+                    {format(subhive.createdAt, "MMMM d, yyyy")}
+                  </time>
+                </dd>
+              </div>
+              <div className="flex justify-between gap-x-4 py-3">
+                <dt className="text-gray-500">Members</dt>
+                <dd className="text-gray-700">
+                  <div className="text-gray-900">{memberCount}</div>
+                </dd>
+              </div>
+
+              {subhive.creatorId === session?.user.id ? (
+                <div className="flex justify-between gap-x-4 py-3">
+                  <p className="text-gray-500">You created this subhive</p>
+                </div>
+              ) : null}
+
+              {subhive.creatorId !== session?.user.id ? (
+                <SubscribeLeaveToggle
+                  subhiveId={subhive.id}
+                  subhiveName={subhive.name}
+                  isSubscribed={isSubscribed}
+                />
+              ) : null}
+
+              <Link
+                href={`hive/${slug}/submit`}
+                className={buttonVariants({
+                  variant: "outline",
+                  className: "w-full mb-6",
+                })}
+              >
+                Create thread
+              </Link>
+            </dl>
           </div>
         </div>
       </div>
