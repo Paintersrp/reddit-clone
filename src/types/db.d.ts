@@ -6,3 +6,5 @@ export type ExtendedThreads = Thread & {
   author: User;
   comments: Comment[];
 };
+
+

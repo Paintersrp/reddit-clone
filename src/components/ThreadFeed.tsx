@@ -54,7 +54,7 @@ const ThreadFeed: FC<ThreadFeedProps> = ({ initialThreads, subhiveName }) => {
   const threads = data?.pages.flatMap((page) => page) ?? initialThreads;
 
   return (
-    <ul className="flex flex-col col-span-2 space-y-6 mt-6">
+    <ul className="flex flex-col col-span-2 space-y-6">
       {threads.map((thread, index) => {
         const votesAmt = thread.votes.reduce((acc, vote) => {
           if (vote.type === "UP") return acc + 1;

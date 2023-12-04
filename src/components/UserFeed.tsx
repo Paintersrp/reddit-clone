@@ -9,6 +9,9 @@ interface UserFeedProps {
 }
 
 const UserFeed = async ({ session }: UserFeedProps) => {
+  let whereClause = {};
+
+  // Retrieve the user's followed communities
   const followedCommunities = await db.subscription.findMany({
     where: {
       userId: session.user.id,
@@ -18,14 +21,19 @@ const UserFeed = async ({ session }: UserFeedProps) => {
     },
   });
 
-  const threads = await db.thread.findMany({
-    where: {
+  // If the user has followed communities, we filter the threads to those communities. We none, we provide leave an empty where clause for a general feed.
+  if (followedCommunities.length > 0) {
+    whereClause = {
       subhive: {
         name: {
           in: followedCommunities.map(({ subhive }) => subhive.id),
         },
       },
-    },
+    };
+  }
+
+  const threads = await db.thread.findMany({
+    where: whereClause,
     orderBy: {
       createdAt: "desc",
     },

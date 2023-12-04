@@ -13,7 +13,7 @@ type JoinedThread = Thread & {
   votes: Vote[];
 };
 
-export const reduceVotes = (thread: JoinedThread) => {
+export const reduceVotes = (thread: Omit<JoinedThread, "author">) => {
   return thread.votes.reduce((acc, vote) => {
     if (vote.type === "UP") return acc + 1;
     if (vote.type === "DOWN") return acc - 1;

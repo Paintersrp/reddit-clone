@@ -53,13 +53,16 @@ export async function GET(req: Request) {
       };
     } else if (session) {
       // If we have no subhive name but have a user, we filter to their communities
-      whereClause = {
-        subhive: {
-          id: {
-            in: followedCommunitiesIds,
+      // We also verify that the user has followed communities, and if not we leave an empty where clause
+      if (followedCommunitiesIds.length > 0) {
+        whereClause = {
+          subhive: {
+            id: {
+              in: followedCommunitiesIds,
+            },
           },
-        },
-      };
+        };
+      }
     }
 
     // Use limit, page, and any where conditions to query the db for threads

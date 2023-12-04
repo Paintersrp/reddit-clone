@@ -3,14 +3,18 @@ import axios from "axios";
 export async function GET(req: Request) {
   const url = new URL(req.url);
 
+  // Retrieve the href used in the link
   const href = url.searchParams.get("url");
 
+  // Handle invalid or missing hrefs
   if (!href) {
     return new Response("Invalid href", { status: 400 });
   }
 
+  // GET link
   const res = await axios.get(href);
 
+  
   const titleMatch = res.data.match(/<title>(.*?)<\/title>/);
   const title = titleMatch ? titleMatch[1] : "";
 
