@@ -1,7 +1,7 @@
 "use client";
 
 import axios from "axios";
-import { FC, useRef } from "react";
+import { FC, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useIntersection } from "@mantine/hooks";
@@ -29,7 +29,7 @@ const ThreadFeed: FC<ThreadFeedProps> = ({ initialThreads, subhiveName }) => {
     ["inf-query"],
     async ({ pageParam = 1 }) => {
       const query =
-        `/api/thread?limit=${INFINITE_SCROLLING_PER_PAGE}&page=${pageParam}` +
+        `/api/threads?limit=${INFINITE_SCROLLING_PER_PAGE}&page=${pageParam}` +
         (!!subhiveName ? `&subhiveName=${subhiveName}` : "");
 
       const { data } = await axios.get(query);
@@ -43,6 +43,13 @@ const ThreadFeed: FC<ThreadFeedProps> = ({ initialThreads, subhiveName }) => {
       initialData: { pages: [initialThreads], pageParams: [1] },
     }
   );
+
+  useEffect(() => {
+    // Load more posts when the last post comes into view
+    if (entry?.isIntersecting) {
+      fetchNextPage();
+    }
+  }, [entry, fetchNextPage]);
 
   const threads = data?.pages.flatMap((page) => page) ?? initialThreads;
 
@@ -68,16 +75,20 @@ const ThreadFeed: FC<ThreadFeedProps> = ({ initialThreads, subhiveName }) => {
                 commentAmt={thread.comments.length}
                 subhiveName={thread.subhive.name}
                 thread={thread}
+                currentVote={currentVote}
+                votesAmt={votesAmt}
               />
             </li>
           );
         } else {
           return (
             <Thread
-              commentAmt={thread.comments.length}
               key={thread.id}
+              commentAmt={thread.comments.length}
               subhiveName={thread.subhive.name}
               thread={thread}
+              currentVote={currentVote}
+              votesAmt={votesAmt}
             />
           );
         }

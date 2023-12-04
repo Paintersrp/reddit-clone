@@ -1,1 +1,2 @@
-export const INFINITE_SCROLLING_PER_PAGE = 5
+export const INFINITE_SCROLLING_PER_PAGE = 2;
+export const CACHE_AFTER_UPVOTES = 1;

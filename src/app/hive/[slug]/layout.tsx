@@ -1,11 +1,11 @@
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
+import Link from "next/link";
 
 import { Button, buttonVariants } from "@/components/ui/Button";
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import SubscribeLeaveToggle from "@/components/SubscribeLeaveToggle";
-import Link from "next/link";
 
 const Layout = async ({
   children,
@@ -16,9 +16,12 @@ const Layout = async ({
     slug: string;
   };
 }) => {
-  const session = await getAuthSession();
   const { slug } = params;
 
+  // Retrieve session, if exists
+  const session = await getAuthSession();
+
+  // Retrieve subhive data, if exists
   const subhive = await db.subhive.findFirst({
     where: { name: slug },
     include: {
@@ -31,6 +34,7 @@ const Layout = async ({
     },
   });
 
+  // Retrieve user's subscription status to subhive
   const subscription = !session?.user
     ? undefined
     : await db.subscription.findFirst({
@@ -44,10 +48,13 @@ const Layout = async ({
         },
       });
 
+  // Boolean of user subscription status
   const isSubscribed = !!subscription;
 
+  // Return not found if no subhive for slug
   if (!subhive) return notFound();
 
+  // Member count of user's subscribed to subhive
   const memberCount = await db.subscription.count({
     where: {
       subhive: {
@@ -86,12 +93,14 @@ const Layout = async ({
                 </dd>
               </div>
 
+              {/* If user is creator, display that instead of leave community button */}
               {subhive.creatorId === session?.user.id ? (
                 <div className="flex justify-between gap-x-4 py-3">
                   <p className="text-gray-500">You created this subhive</p>
                 </div>
               ) : null}
 
+              {/* If user is not creator, display leave community button */}
               {subhive.creatorId !== session?.user.id ? (
                 <SubscribeLeaveToggle
                   subhiveId={subhive.id}

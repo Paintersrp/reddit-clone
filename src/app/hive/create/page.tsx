@@ -12,11 +12,14 @@ import { toast } from "@/hooks/use-toast";
 import { useAuthToast } from "@/hooks/use-auth-toast";
 
 const Page = () => {
-  const [input, setInput] = useState<string>("");
-  const { loginToast } = useAuthToast();
   const router = useRouter();
+  const { loginToast } = useAuthToast();
 
+  const [input, setInput] = useState<string>("");
+
+  // Returns mutation function (renamed createHive) and loading state
   const { mutate: createHive, isLoading } = useMutation({
+    // Create Subhive
     mutationFn: async () => {
       const payload: CreateSubhivePayload = {
         name: input,
@@ -26,8 +29,11 @@ const Page = () => {
 
       return data as string;
     },
+
+    // Error Handling
     onError: (err) => {
       if (err instanceof AxiosError) {
+        // Subhive exists error
         if (err.response?.status === 409) {
           return toast({
             title: "Subhive already exists.",
@@ -36,6 +42,7 @@ const Page = () => {
           });
         }
 
+        // Subhive name doesn't match validation error
         if (err.response?.status === 422) {
           return toast({
             title: "Invalid subhive name.",
@@ -44,10 +51,12 @@ const Page = () => {
           });
         }
 
+        // Not logged in error
         if (err.response?.status === 401) {
           return loginToast();
         }
 
+        // Unknown Error
         toast({
           title: "There was a problem",
           description: "Could not create subhive.",

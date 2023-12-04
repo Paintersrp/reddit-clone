@@ -2,9 +2,9 @@ import { Inter } from "next/font/google";
 import "@/styles/globals.css";
 
 import { cn } from "@/lib/utils";
+import Providers from "@/components/Providers";
 import Navbar from "@/components/ui/Navbar";
 import { Toaster } from "@/components/ui/Toaster";
-import Providers from "@/components/Providers";
 
 export const metadata = {
   title: "Hivemind",

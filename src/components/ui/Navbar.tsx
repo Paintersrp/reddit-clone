@@ -1,12 +1,12 @@
 import Link from "next/link";
-import React, { Fragment } from "react";
+import React from "react";
 
 import { Icons } from "./Icons";
 import { buttonVariants } from "./Button";
 import { getAuthSession } from "@/lib/auth";
 import UserMenu from "../UserMenu";
 
-const Navbar = async ({}) => {
+export const Navbar = async ({}) => {
   const session = await getAuthSession();
 
   return (

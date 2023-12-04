@@ -1,9 +1,14 @@
-import { formatTimeToNow } from "@/lib/utils";
+"use client";
+
+import { FC, useRef } from "react";
 import { Thread, User, Vote } from "@prisma/client";
 import { MessageSquare } from "lucide-react";
-import Link from "next/link";
-import { FC, useRef } from "react";
+
+import { formatTimeToNow } from "@/lib/utils";
 import EditorOutput from "./EditorOutput";
+import VoteClient from "./vote/VoteClient";
+
+type PartialVote = Pick<Vote, "type">;
 
 interface ThreadProps {
   subhiveName: string;
@@ -12,14 +17,27 @@ interface ThreadProps {
     votes: Vote[];
   };
   commentAmt: number;
+  votesAmt: number;
+  currentVote?: PartialVote;
 }
 
-const Thread: FC<ThreadProps> = ({ subhiveName, thread, commentAmt }) => {
+const Thread: FC<ThreadProps> = ({
+  subhiveName,
+  thread,
+  commentAmt,
+  votesAmt,
+  currentVote,
+}) => {
   const threadRef = useRef<HTMLDivElement>(null);
 
   return (
     <div className="rounded-md bg-white shadow">
       <div className="px-6 py-4 flex justify-between">
+        <VoteClient
+          threadId={thread.id}
+          initialVote={currentVote?.type}
+          initialVotesAmt={votesAmt}
+        />
         <div className="w-0 flex-1">
           <div className="max-h-40 mt-1 text-xs text-gray-500">
             {subhiveName ? (

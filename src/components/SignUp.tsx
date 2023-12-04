@@ -3,6 +3,7 @@ import { Icons } from "./ui/Icons";
 import Link from "next/link";
 import AuthForm from "./AuthForm";
 
+// Sign In / Sign Up left as separate components for future proofing
 const SignUp: FC = ({}) => {
   return (
     <div className="container mx-auto flex w-full flex-col justify-center space-y-6">

@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { Metadata } from "next";
 
 import { db } from "@/lib/db";
 import { getAuthSession } from "@/lib/auth";
@@ -10,6 +11,17 @@ import ThreadFeed from "@/components/ThreadFeed";
 interface PageProps {
   params: {
     slug: string;
+  };
+}
+
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { slug } = params;
+
+  return {
+    title: `Hivemind - hive/${slug}`,
+    description: `Hivemind community for ${slug}`,
   };
 }
 
@@ -28,7 +40,7 @@ const Page = async ({ params }: PageProps) => {
           comments: true,
           subhive: true,
         },
-
+        orderBy: { createdAt: "desc" },
         take: INFINITE_SCROLLING_PER_PAGE,
       },
     },
