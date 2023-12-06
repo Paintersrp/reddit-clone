@@ -1,6 +1,6 @@
 import TextAreaAutosize from "react-textarea-autosize";
 
-const EditorSkeleton = () => (
+export const EditorSkeleton = () => (
   <div className="w-full p-4 bg-zinc-50 rounded-lg border border-zinc-200">
     <TextAreaAutosize
       disabled

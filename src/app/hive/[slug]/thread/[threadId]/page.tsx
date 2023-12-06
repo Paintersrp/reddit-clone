@@ -1,15 +1,17 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { ArrowBigDown, ArrowBigUp, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 import { db } from "@/lib/db";
 import { redis } from "@/lib/redis";
 import { ExtendedThreads } from "@/types/db";
 import { CachedThread } from "@/types/redis";
-import { buttonVariants } from "@/components/ui/Button";
-import VoteServer from "@/components/vote/VoteServer";
 import { formatTimeToNow } from "@/lib/utils";
-import EditorOutput from "@/components/EditorOutput";
+
+import VoteServer from "@/components/vote/VoteServer";
+import VoteSkeleton from "@/components/vote/VoteSkeleton";
+import EditorOutput from "@/components/editor/EditorOutput";
+import Comments from "@/components/comments/Comments";
 
 interface PageProps {
   params: {
@@ -81,28 +83,17 @@ const Page = async ({ params }: PageProps) => {
 
           {/* Thread Content */}
           <EditorOutput content={thread?.content ?? cachedThread.content} />
+
+          {/* Thread Comments */}
+          <Suspense
+            fallback={
+              <Loader2 className="h-5 w-5 animate-spin text-zinc-500" />
+            }
+          >
+            {/* @ts-expect-error Server Component */}
+            <Comments threadId={thread?.id ?? cachedThread.id} />
+          </Suspense>
         </div>
-      </div>
-    </div>
-  );
-};
-
-const VoteSkeleton = () => {
-  return (
-    <div className="flex items-center flex-col pr-6 w-20">
-      {/* Upvote */}
-      <div className={buttonVariants({ variant: "ghost" })}>
-        <ArrowBigUp className="h-5 w-5 text-zinc-700" />
-      </div>
-
-      {/* Score */}
-      <div className="text-center py-2 font-medium text-sm text-zinc-900">
-        <Loader2 className="h-3 w-3 animate-spin" />
-      </div>
-
-      {/* Downvote */}
-      <div className={buttonVariants({ variant: "ghost" })}>
-        <ArrowBigDown className="h-5 w-5 text-zinc-700" />
       </div>
     </div>
   );

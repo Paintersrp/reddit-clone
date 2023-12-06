@@ -1,8 +1,7 @@
 import { z } from "zod";
 
-import { ThreadVoteValidator } from "@/lib/validators/vote";
+import { CommentVoteValidator } from "@/lib/validators/vote";
 import { getAuthSession } from "@/lib/auth";
-import { tallyVoteScoreAndCache } from "@/lib/votes";
 import { db } from "@/lib/db";
 
 export async function PATCH(req: Request) {
@@ -10,7 +9,7 @@ export async function PATCH(req: Request) {
     const body = await req.json();
 
     // Validate request body
-    const { threadId, voteType } = ThreadVoteValidator.parse(body);
+    const { commentId, voteType } = CommentVoteValidator.parse(body);
 
     // Get session, if it exists
     const session = await getAuthSession();
@@ -21,36 +20,20 @@ export async function PATCH(req: Request) {
     }
 
     // Check if vote already exists
-    const existingVote = await db.vote.findFirst({
+    const existingVote = await db.commentVote.findFirst({
       where: {
         userId: session.user.id,
-        threadId,
+        commentId,
       },
     });
-
-    // Fetch current thread for caching with joins
-    const thread = await db.thread.findUnique({
-      where: {
-        id: threadId,
-      },
-      include: {
-        author: true,
-        votes: true,
-      },
-    });
-
-    // Handles any case of no threads, if somehow occured
-    if (!thread) {
-      return new Response("Thread not found", { status: 404 });
-    }
 
     if (existingVote) {
       // If the user's current vote is the same as the incoming request voteType, we delete it
       if (existingVote.type === voteType) {
-        await db.vote.delete({
+        await db.commentVote.delete({
           where: {
-            userId_threadId: {
-              threadId,
+            userId_commentId: {
+              commentId,
               userId: session.user.id,
             },
           },
@@ -60,10 +43,10 @@ export async function PATCH(req: Request) {
       }
 
       // If the vote isn't the same as the previous vote status, we update the user's vote for this thread to the new voteType
-      await db.vote.update({
+      await db.commentVote.update({
         where: {
-          userId_threadId: {
-            threadId,
+          userId_commentId: {
+            commentId,
             userId: session.user.id,
           },
         },
@@ -72,23 +55,17 @@ export async function PATCH(req: Request) {
         },
       });
 
-      // Checks new vote count and caches in Redis if necessary
-      tallyVoteScoreAndCache(thread, voteType);
-
       return new Response("OK");
     }
 
     // No existing vote, create one
-    await db.vote.create({
+    await db.commentVote.create({
       data: {
         type: voteType,
         userId: session.user.id,
-        threadId,
+        commentId,
       },
     });
-
-    // Checks new vote count and caches in Redis if necessary
-    tallyVoteScoreAndCache(thread, voteType);
 
     return new Response("OK");
   } catch (error) {

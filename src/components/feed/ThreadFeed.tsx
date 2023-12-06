@@ -8,7 +8,7 @@ import { useIntersection } from "@mantine/hooks";
 
 import { ExtendedThreads } from "@/types/db";
 import { INFINITE_SCROLLING_PER_PAGE } from "@/config";
-import Thread from "./Thread";
+import Thread from "../threads/Thread";
 
 interface ThreadFeedProps {
   initialThreads: ExtendedThreads[];

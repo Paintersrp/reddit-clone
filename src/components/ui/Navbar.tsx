@@ -4,7 +4,7 @@ import React from "react";
 import { Icons } from "./Icons";
 import { buttonVariants } from "./Button";
 import { getAuthSession } from "@/lib/auth";
-import UserMenu from "../UserMenu";
+import UserMenu from "../layout/UserMenu";
 
 export const Navbar = async ({}) => {
   const session = await getAuthSession();

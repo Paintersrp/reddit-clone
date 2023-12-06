@@ -11,8 +11,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-} from "./ui/DropdownMenu";
-import UserAvatar from "./UserAvatar";
+} from "../ui/DropdownMenu";
+import UserAvatar from "../ui/UserAvatar";
 
 interface UserMenuProps {
   user: Pick<User, "name" | "image" | "email">;

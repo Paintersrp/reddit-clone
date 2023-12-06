@@ -1,10 +1,14 @@
 "use client";
 
+import type EditorJS from "@editorjs/editorjs";
+
 import { FC, useCallback, useEffect, useRef, useState } from "react";
 import TextAreaAutosize from "react-textarea-autosize";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type EditorJS from "@editorjs/editorjs";
+import { useMutation } from "@tanstack/react-query";
+import { usePathname, useRouter } from "next/navigation";
+import axios from "axios";
 
 import {
   ThreadCreationRequest,
@@ -12,10 +16,7 @@ import {
 } from "@/lib/validators/thread";
 import { uploadFiles } from "@/lib/uploadthing";
 import { toast } from "@/hooks/use-toast";
-import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
-import { usePathname, useRouter } from "next/navigation";
-import EditorSkeleton from "./EditorSkeleton";
+import { EditorSkeleton } from "./EditorSkeleton";
 
 interface EditorProps {
   subhiveId: string;

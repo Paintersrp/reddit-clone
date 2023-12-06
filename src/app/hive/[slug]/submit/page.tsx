@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 
 import { db } from "@/lib/db";
 import { Button } from "@/components/ui/Button";
-import Editor from "@/components/Editor";
+import Editor from "@/components/editor/Editor";
 
 interface PageProps {
   params: {

@@ -3,8 +3,8 @@
 import { FC, useState } from "react";
 import { signIn } from "next-auth/react";
 
-import { Button } from "./ui/Button";
-import { Icons } from "./ui/Icons";
+import { Button } from "../ui/Button";
+import { Icons } from "../ui/Icons";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 

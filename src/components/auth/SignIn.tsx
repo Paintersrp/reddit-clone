@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { Icons } from "./ui/Icons";
+import { Icons } from "../ui/Icons";
 import Link from "next/link";
 import AuthForm from "./AuthForm";
 

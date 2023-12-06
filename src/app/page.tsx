@@ -1,8 +1,8 @@
 import { HomeIcon } from "lucide-react";
 import Link from "next/link";
 
-import GeneralFeed from "@/components/GeneralFeed";
-import UserFeed from "@/components/UserFeed";
+import GeneralFeed from "@/components/feed/GeneralFeed";
+import UserFeed from "@/components/feed/UserFeed";
 import { buttonVariants } from "@/components/ui/Button";
 import { getAuthSession } from "@/lib/auth";
 

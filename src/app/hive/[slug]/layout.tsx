@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Button, buttonVariants } from "@/components/ui/Button";
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
-import SubscribeLeaveToggle from "@/components/SubscribeLeaveToggle";
+import SubscribeLeaveToggle from "@/components/layout/SubscribeLeaveToggle";
 
 const Layout = async ({
   children,

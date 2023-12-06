@@ -5,8 +5,8 @@ import { Thread, User, Vote } from "@prisma/client";
 import { MessageSquare } from "lucide-react";
 
 import { formatTimeToNow } from "@/lib/utils";
-import EditorOutput from "./EditorOutput";
-import VoteClient from "./vote/VoteClient";
+import EditorOutput from "../editor/EditorOutput";
+import VoteClient from "../vote/VoteClient";
 
 type PartialVote = Pick<Vote, "type">;
 

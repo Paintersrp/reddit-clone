@@ -5,8 +5,8 @@ import { db } from "@/lib/db";
 import { getAuthSession } from "@/lib/auth";
 import { INFINITE_SCROLLING_PER_PAGE } from "@/config";
 
-import CreateThread from "@/components/CreateThread";
-import ThreadFeed from "@/components/ThreadFeed";
+import CreateThread from "@/components/threads/CreateThread";
+import ThreadFeed from "@/components/feed/ThreadFeed";
 
 interface PageProps {
   params: {

@@ -1,8 +1,8 @@
-import { FC } from "react";
 import { Thread, Vote, VoteType } from "@prisma/client";
-import { getAuthSession } from "@/lib/auth";
 import { notFound } from "next/navigation";
-import { reduceVotes } from "@/lib/redis";
+
+import { getAuthSession } from "@/lib/auth";
+import { tallyVoteScore } from "@/lib/votes";
 import VoteClient from "./VoteClient";
 
 interface VoteServerProps {
@@ -28,7 +28,7 @@ const VoteServer = async ({
 
     if (!thread) return notFound();
 
-    _votesAmt = reduceVotes(thread);
+    _votesAmt = tallyVoteScore(thread);
     _currentVote = thread.votes.find(
       (vote) => vote.userId === session?.user.id
     )?.type;

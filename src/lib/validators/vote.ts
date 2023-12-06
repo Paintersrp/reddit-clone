@@ -8,7 +8,7 @@ export const ThreadVoteValidator = z.object({
 export type ThreadVoteRequest = z.infer<typeof ThreadVoteValidator>;
 
 export const CommentVoteValidator = z.object({
-  threadId: z.string(),
+  commentId: z.string(),
   voteType: z.enum(["UP", "DOWN"]),
 });
 
