@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { SubhiveSubscriptionValidator } from "@/lib/validators/subhive";
+import { SubhiveSubscriptionValidator } from "@/lib/validators/subscribe";
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 
