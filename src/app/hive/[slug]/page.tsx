@@ -49,14 +49,14 @@ const Page = async ({ params }: PageProps) => {
   if (!subhive) return notFound();
 
   return (
-    <div>
+    <>
       <h1 className="font-bold text-3xl md:text-4xl h-14">
         hive/{subhive.name}
       </h1>
 
       <CreateThread session={session} />
       <ThreadFeed initialThreads={subhive.threads} subhiveName={subhive.name} />
-    </div>
+    </>
   );
 };
 

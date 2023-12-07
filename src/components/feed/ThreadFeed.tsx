@@ -9,6 +9,7 @@ import { useIntersection } from "@mantine/hooks";
 import { ExtendedThreads } from "@/types/db";
 import { INFINITE_SCROLLING_PER_PAGE } from "@/config";
 import Thread from "../threads/Thread";
+import { Loader2 } from "lucide-react";
 
 interface ThreadFeedProps {
   initialThreads: ExtendedThreads[];
@@ -93,6 +94,12 @@ const ThreadFeed: FC<ThreadFeedProps> = ({ initialThreads, subhiveName }) => {
           );
         }
       })}
+
+      {isFetchingNextPage && (
+        <li className="flex justify-center">
+          <Loader2 className="w-6 h-6 text-zinc-500 animate-spin" />
+        </li>
+      )}
     </ul>
   );
 };

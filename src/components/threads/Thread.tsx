@@ -51,7 +51,7 @@ const Thread: FC<ThreadProps> = ({
                 <span className="px-1">•</span>
               </>
             ) : null}
-            <span>Posted by u/{thread.author.name}</span>
+            <span>Posted by u/{thread.author.username}</span>
             {"  "}
             {formatTimeToNow(new Date(thread.createdAt))}
           </div>

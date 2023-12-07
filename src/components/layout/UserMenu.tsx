@@ -47,7 +47,7 @@ const UserMenu: FC<UserMenuProps> = ({ user }) => {
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild className="text-sm">
-          <Link href="/r/create">Create Community</Link>
+          <Link href="/hive/create">Create Community</Link>
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild className="text-sm">
