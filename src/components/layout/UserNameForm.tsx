@@ -51,7 +51,7 @@ const UserNameForm: FC<UserNameFormProps> = ({ user }) => {
     // Error Handling
     onError: (err) => {
       if (err instanceof AxiosError) {
-        // Subhive exists error
+        // Username exists error
         if (err.response?.status === 409) {
           return toast({
             title: "Username already exists.",
@@ -101,7 +101,7 @@ const UserNameForm: FC<UserNameFormProps> = ({ user }) => {
             </Label>
             <Input
               id="name"
-              className="w-[400px] pl-6"
+              className="w-full max-w-[400px] pl-6"
               size={32}
               {...register("name")}
             />

@@ -84,7 +84,7 @@ const VoteClient = ({
   });
 
   return (
-    <div className="flex flex-col gap-0 md:gap-4 pr-6 sm:w-20 pb-4 sm:pb-0">
+    <div className="flex flex-col gap-0 md:gap-4git  pr-6 sm:w-20 pb-4 sm:pb-0">
       <Button
         onClick={() => vote("UP")}
         size="sm"
