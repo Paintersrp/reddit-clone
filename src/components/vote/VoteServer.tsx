@@ -2,7 +2,7 @@ import { Thread, Vote, VoteType } from "@prisma/client";
 import { notFound } from "next/navigation";
 
 import { getAuthSession } from "@/lib/auth";
-import { tallyVoteScore } from "@/lib/votes";
+import { tallyVoteScore } from "@/lib/tally";
 import VoteClient from "./VoteClient";
 
 interface VoteServerProps {

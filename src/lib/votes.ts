@@ -1,20 +1,10 @@
-import { Vote, VoteType } from "@prisma/client";
+import { VoteType } from "@prisma/client";
 
 import { CACHE_AFTER_UPVOTES } from "@/config";
 import { JoinedThread } from "@/types/db";
 import { CachedThread } from "@/types/redis";
 import { redis } from "./redis";
-
-/*
- * Reduces the upvotes and downvotes to an accumulated score
- */
-export const tallyVoteScore = (content: any) => {
-  return content.votes.reduce((acc: number, vote: Vote) => {
-    if (vote.type === "UP") return acc + 1;
-    if (vote.type === "DOWN") return acc - 1;
-    return acc;
-  }, 0);
-};
+import { tallyVoteScore } from "./tally";
 
 /*
  * Reduces the upvotes and downvotes to an accumulated score and checks if the thread

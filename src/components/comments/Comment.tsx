@@ -1,28 +1,31 @@
 "use client";
 
 import { FC, useRef, useState } from "react";
-
-import { ExtendedComment } from "@/types/db";
-import UserAvatar from "../ui/UserAvatar";
-import { formatTimeToNow } from "@/lib/utils";
-import CommentVotes from "./CommentVotes";
 import { CommentVote } from "@prisma/client";
-import { Button } from "../ui/Button";
-import { MessageSquare } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { Label } from "../ui/Label";
-import { Textarea } from "../ui/Textarea";
-import { CommentRequest } from "@/lib/validators/comment";
-import axios, { AxiosError } from "axios";
-import { toast, useAuthToast } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
+import { MessageSquare } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import axios, { AxiosError } from "axios";
+
+import { toast, useAuthToast } from "@/hooks";
+import { formatTimeToNow } from "@/lib/utils";
+import { CommentRequest } from "@/lib/validators/comment";
+import { Textarea } from "../ui/Textarea";
+import { Button } from "../ui/Button";
+import { Label } from "../ui/Label";
+import UserAvatar from "../ui/UserAvatar";
+import CommentVotes from "./CommentVotes";
+
+import type { ExtendedComment } from "@/types/db";
 
 interface CommentProps {
   comment: ExtendedComment;
   votesAmt: number;
   currentVote: CommentVote | undefined;
   threadId: string;
+  isCollapsed: boolean;
+  handleCollapse: () => void;
 }
 
 const Comment: FC<CommentProps> = ({
@@ -30,6 +33,8 @@ const Comment: FC<CommentProps> = ({
   votesAmt,
   currentVote,
   threadId,
+  isCollapsed,
+  handleCollapse,
 }) => {
   const router = useRouter();
   const commentRef = useRef<HTMLDivElement>(null);
@@ -37,6 +42,7 @@ const Comment: FC<CommentProps> = ({
   const { loginToast } = useAuthToast();
 
   const [isReplying, setIsReplying] = useState<boolean>(false);
+
   const [input, setInput] = useState<string>("");
 
   const replyClick = () => {
@@ -45,7 +51,6 @@ const Comment: FC<CommentProps> = ({
   };
 
   const mutationFn = async ({ threadId, text, replyToId }: CommentRequest) => {
-    console.log(replyToId);
     const payload: CommentRequest = {
       threadId,
       text,
@@ -85,22 +90,24 @@ const Comment: FC<CommentProps> = ({
 
   return (
     <div ref={commentRef} className="flex flex-col">
-      <div className="flex items-center">
-        <UserAvatar
-          user={{
-            name: comment.author.name || null,
-            image: comment.author.image || null,
-          }}
-          className="h-6 w-6"
-        />
-        <div className="ml-2 flex items-center gap-x-2">
-          <p className="text-sm font-medium text-gray-900">
-            u/{comment.author.username}
-          </p>
+      <div className="flex w-full items-center justify-between">
+        <div className="flex">
+          <UserAvatar
+            user={{
+              name: comment.author.name || null,
+              image: comment.author.image || null,
+            }}
+            className="h-6 w-6"
+          />
+          <div className="ml-2 flex items-center gap-x-2">
+            <p className="text-sm font-medium text-gray-900">
+              u/{comment.author.username}
+            </p>
 
-          <p className="max-h-40 truncate text-xs text-zinc-500">
-            {formatTimeToNow(new Date(comment.createdAt))}
-          </p>
+            <p className="max-h-40 truncate text-xs text-zinc-500">
+              {formatTimeToNow(new Date(comment.createdAt))}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -113,9 +120,13 @@ const Comment: FC<CommentProps> = ({
           initialVote={currentVote}
         />
 
-        <Button onClick={replyClick} variant="ghost" size="xs">
+        <Button onClick={replyClick} variant="ghost" size="xxs">
           <MessageSquare className="h-4 w-4 mr-1.5" />
           Reply
+        </Button>
+
+        <Button onClick={handleCollapse} variant="ghost" size="xxs">
+          {isCollapsed ? "Expand" : "Collapse"}
         </Button>
 
         {isReplying ? (
