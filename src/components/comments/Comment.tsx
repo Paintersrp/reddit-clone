@@ -3,7 +3,7 @@
 import { FC, useRef, useState } from "react";
 import { CommentVote } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Trash } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import axios, { AxiosError } from "axios";
@@ -18,6 +18,7 @@ import UserAvatar from "../ui/UserAvatar";
 import CommentVotes from "./CommentVotes";
 
 import type { ExtendedComment } from "@/types/db";
+import { DeleteCommentRequest } from "@/lib/validators/delete";
 
 interface CommentProps {
   comment: ExtendedComment;
@@ -38,19 +39,19 @@ const Comment: FC<CommentProps> = ({
 }) => {
   const router = useRouter();
   const commentRef = useRef<HTMLDivElement>(null);
-  const { data: session } = useSession();
   const { loginToast } = useAuthToast();
-
-  const [isReplying, setIsReplying] = useState<boolean>(false);
+  const { data: session } = useSession();
 
   const [input, setInput] = useState<string>("");
+  const [isReplying, setIsReplying] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   const replyClick = () => {
     if (!session) return router.push("/sign-in");
     setIsReplying(!isReplying);
   };
 
-  const mutationFn = async ({ threadId, text, replyToId }: CommentRequest) => {
+  const replyMutate = async ({ threadId, text, replyToId }: CommentRequest) => {
     const payload: CommentRequest = {
       threadId,
       text,
@@ -62,7 +63,7 @@ const Comment: FC<CommentProps> = ({
     return data;
   };
 
-  const onError = (err: unknown) => {
+  const replyError = (err: unknown) => {
     if (err instanceof AxiosError) {
       if (err.response?.status === 401) {
         return loginToast();
@@ -76,17 +77,63 @@ const Comment: FC<CommentProps> = ({
     });
   };
 
-  const onSuccess = () => {
+  const replySuccess = () => {
     router.refresh();
     setIsReplying(false);
     setInput("");
   };
 
-  const { mutate: createReply, isLoading } = useMutation({
-    mutationFn,
-    onError,
-    onSuccess,
+  const { mutate: createReply, isLoading: replyLoading } = useMutation({
+    mutationFn: replyMutate,
+    onError: replyError,
+    onSuccess: replySuccess,
   });
+
+  // TODO Implement Modal
+  // TODO Implement User to Anomymous on Delete as well
+  const deleteClick = () => {
+    setIsDeleting(!isDeleting);
+  };
+
+  const deleteMutate = async ({ commentId }: DeleteCommentRequest) => {
+    const payload: DeleteCommentRequest = {
+      commentId,
+    };
+
+    const { data } = await axios.patch(
+      "/api/subhive/thread/comment/delete",
+      payload
+    );
+
+    return data;
+  };
+
+  const deleteError = (err: unknown) => {
+    if (err instanceof AxiosError) {
+      if (err.response?.status === 401) {
+        return loginToast();
+      }
+    }
+
+    return toast({
+      title: "There was a problem.",
+      description: "Something went wrong, please try again.",
+      variant: "destructive",
+    });
+  };
+
+  const deleteSuccess = () => {
+    router.refresh();
+    setIsDeleting(false);
+  };
+
+  const { mutate: deleteComment, isLoading: deleteLoading } = useMutation({
+    mutationFn: deleteMutate,
+    onError: deleteError,
+    onSuccess: deleteSuccess,
+  });
+
+  console.log(session?.user.id === comment.authorId);
 
   return (
     <div ref={commentRef} className="flex flex-col">
@@ -113,21 +160,42 @@ const Comment: FC<CommentProps> = ({
 
       <p className="text-sm text-zinc-900 mt-2">{comment.text}</p>
 
-      <div className="flex gap-2 items-center flex-wrap">
-        <CommentVotes
-          commentId={comment.id}
-          initialVotesAmt={votesAmt}
-          initialVote={currentVote}
-        />
+      <div className="flex flex-wrap">
+        <div className="flex justify-between w-full items-center">
+          <div className="flex items-center gap-1 md:gap-2">
+            <CommentVotes
+              commentId={comment.id}
+              initialVotesAmt={votesAmt}
+              initialVote={currentVote}
+            />
 
-        <Button onClick={replyClick} variant="ghost" size="xxs">
-          <MessageSquare className="h-4 w-4 mr-1.5" />
-          Reply
-        </Button>
+            <Button onClick={replyClick} variant="ghost" size="xxs">
+              <MessageSquare className="h-4 w-4 mr-1.5" />
+              <p className="text-xs md:text-sm">Reply</p>
+            </Button>
 
-        <Button onClick={handleCollapse} variant="ghost" size="xxs">
-          {isCollapsed ? "Expand" : "Collapse"}
-        </Button>
+            <Button onClick={handleCollapse} variant="ghost" size="xxs">
+              {/* TODO Icon? */}
+              <p className="text-xs md:text-sm">
+                {isCollapsed ? "Expand" : "Collapse"}
+              </p>
+            </Button>
+          </div>
+
+          {/* TODO Confirm Delete Modal */}
+          {/* TODO Also check if comment already has been deleted */}
+          {session?.user.id === comment.authorId && (
+            <Button
+              onClick={() => deleteComment({ commentId: comment.id })}
+              className="bg-red-500 hover:bg-red-600"
+              size="xxs"
+              isLoading={deleteLoading}
+            >
+              {/* TODO Icon? */}
+              <Trash className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
 
         {isReplying ? (
           <div className="grid w-full gap-1.5">
@@ -149,7 +217,7 @@ const Comment: FC<CommentProps> = ({
                   Cancel
                 </Button>
                 <Button
-                  isLoading={isLoading}
+                  isLoading={replyLoading}
                   disabled={input.length === 0}
                   onClick={() =>
                     createReply({

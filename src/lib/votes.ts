@@ -20,6 +20,7 @@ export const tallyVoteScoreAndCache = async (
     // If the votes amount is higher than our threshold, we cache a payload for the thread in redis
     const cachePayload: CachedThread = {
       authorUsername: thread.author.username ?? "",
+      authorId: thread.authorId,
       content: JSON.stringify(thread.content),
       id: thread.id,
       title: thread.title,
