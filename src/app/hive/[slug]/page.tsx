@@ -50,7 +50,7 @@ const Page = async ({ params }: PageProps) => {
 
   return (
     <>
-      <h1 className="font-bold text-3xl md:text-4xl h-14">
+      <h1 className="font-bold text-2xl md:text-3xl m-2 ml-4 sm:ml-0">
         hive/{subhive.name}
       </h1>
 

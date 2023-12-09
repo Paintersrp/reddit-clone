@@ -17,7 +17,7 @@ const CreateThread: FC<CreateThreadProps> = ({ session }) => {
   const pathname = usePathname();
 
   return (
-    <div className="overflow-hidden rounded-md bg-white shadow">
+    <div className="overflow-hidden sm:rounded-md mb-4 sm:mb-0 bg-white shadow">
       <div className="h-full px-6 py-4 flex justify-between gap-6 flex-wrap md:flex-nowrap">
         <div className="relative">
           <UserAvatar

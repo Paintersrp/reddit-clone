@@ -28,7 +28,7 @@ export default function RootLayout({
         inter.className
       )}
     >
-      <body className="min-h-screen pt-12 bg-slate-50 antialiased">
+      <body className="min-h-screen bg-slate-50 antialiased">
         <Providers>
           {/* @ts-expect-error Server Component */}
           <Navbar />
@@ -36,7 +36,7 @@ export default function RootLayout({
 
           {authModal}
 
-          <div className="container max-w-7xl xl:max-w-[1600px] mx-auto h-full pt-12">
+          <div className="md:container max-w-7xl xl:max-w-[1600px] md:mx-auto h-full pt-6">
             {children}
           </div>
         </Providers>

@@ -24,7 +24,7 @@ interface DeleteThreadProps {
   threadId: string;
 }
 
-const DeleteThread: FC<DeleteThreadProps> = ({ threadId }) => {
+const DeleteThreadDialog: FC<DeleteThreadProps> = ({ threadId }) => {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
@@ -100,4 +100,4 @@ const DeleteThread: FC<DeleteThreadProps> = ({ threadId }) => {
   );
 };
 
-export default DeleteThread;
+export default DeleteThreadDialog;

@@ -74,7 +74,7 @@ const SearchBar: FC = ({}) => {
           debounceRequest();
         }}
         value={input}
-        className="outline-none border-none focus:border-none focus:outline-none ring-0"
+        className="outline-none border-none focus:border-none focus:outline-none ring-0 h-9 sm:h-11"
         placeholder="Search..."
       />
 

@@ -13,7 +13,7 @@ import VoteServer from "@/components/vote/VoteServer";
 import VoteSkeleton from "@/components/vote/VoteSkeleton";
 import EditorOutput from "@/components/editor/EditorOutput";
 import Comments from "@/components/comments/Comments";
-import DeleteThread from "@/components/threads/DeleteThread";
+import DeleteThreadDialog from "@/components/threads/DeleteThreadDialog";
 
 interface PageProps {
   params: {
@@ -60,58 +60,57 @@ const Page = async ({ params }: PageProps) => {
   };
 
   return (
-    <div>
-      <div className="h-full flex flex-col sm:flex-row items-center sm:items-start justify-between">
-        {/* Thread Header */}
-        <div className="sm:w-0 w-full flex-1 bg-white p-4 rounded-sm">
-          <div className="flex flex-row w-full">
-            <div className="flex w-full">
-              {/* Suspense shows skeleton of votes, avoiding waiting on cache miss */}
-              <Suspense fallback={<VoteSkeleton />}>
-                {/* @ts-expect-error Server Component */}
-                <VoteServer
-                  threadId={thread?.id ?? cachedThread.id}
-                  getData={getVoteData}
-                />
-              </Suspense>
-
-              <div>
-                <p className="max-h-40 mt-1 truncate text-sm text-gray-500">
-                  Created by u/
-                  {thread?.author?.username ?? cachedThread.authorUsername}{" "}
-                  {"  "}
-                  {formatTimeToNow(
-                    new Date(thread?.createdAt ?? cachedThread.createdAt)
-                  )}
-                </p>
-                <h1 className="text-xl font-semibold py-2 leading-6 text-gray-900">
-                  {thread?.title ?? cachedThread.title}
-                </h1>
-              </div>
-            </div>
-
-            {thread?.authorId === session?.user.id && (
-              <DeleteThread threadId={thread?.id ?? cachedThread.id} />
-            )}
-
-            {cachedThread?.authorId === session?.user.id && (
-              <DeleteThread threadId={thread?.id ?? cachedThread.id} />
-            )}
+    <div className="h-full flex flex-col sm:flex-row items-center sm:items-start justify-between">
+      {/* Thread Header */}
+      <div className="sm:w-0 w-full flex-1 bg-white p-4 md:rounded-sm">
+        {thread?.authorId === session?.user.id && (
+          <div className="flex justify-end mb-1">
+            <DeleteThreadDialog threadId={thread?.id ?? cachedThread.id} />
           </div>
+        )}
 
-          {/* Thread Content */}
-          <EditorOutput content={thread?.content ?? cachedThread.content} />
+        {cachedThread?.authorId === session?.user.id && (
+          <div className="flex justify-end mb-1">
+            <DeleteThreadDialog threadId={thread?.id ?? cachedThread.id} />
+          </div>
+        )}
 
-          {/* Thread Comments */}
-          <Suspense
-            fallback={
-              <Loader2 className="h-5 w-5 animate-spin text-zinc-500" />
-            }
-          >
-            {/* @ts-expect-error Server Component */}
-            <Comments threadId={thread?.id ?? cachedThread.id} />
-          </Suspense>
+        <div className="flex flex-row w-full">
+          <div className="flex w-full">
+            {/* Suspense shows skeleton of votes, avoiding waiting on cache miss */}
+            <Suspense fallback={<VoteSkeleton />}>
+              {/* @ts-expect-error Server Component */}
+              <VoteServer
+                threadId={thread?.id ?? cachedThread.id}
+                getData={getVoteData}
+              />
+            </Suspense>
+
+            <div>
+              <p className="max-h-40 mt-1 truncate text-sm text-gray-500">
+                Created by u/
+                {thread?.author?.username ?? cachedThread.authorUsername} {"  "}
+                {formatTimeToNow(
+                  new Date(thread?.createdAt ?? cachedThread.createdAt)
+                )}
+              </p>
+              <h1 className="text-xl font-semibold py-2 leading-6 text-gray-900">
+                {thread?.title ?? cachedThread.title}
+              </h1>
+            </div>
+          </div>
         </div>
+
+        {/* Thread Content */}
+        <EditorOutput content={thread?.content ?? cachedThread.content} />
+
+        {/* Thread Comments */}
+        <Suspense
+          fallback={<Loader2 className="h-5 w-5 animate-spin text-zinc-500" />}
+        >
+          {/* @ts-expect-error Server Component */}
+          <Comments threadId={thread?.id ?? cachedThread.id} />
+        </Suspense>
       </div>
     </div>
   );

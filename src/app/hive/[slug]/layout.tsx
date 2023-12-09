@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import Link from "next/link";
 
-import { Button, buttonVariants } from "@/components/ui/Button";
+import { buttonVariants } from "@/components/ui/Button";
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import SubscribeLeaveToggle from "@/components/layout/SubscribeLeaveToggle";
@@ -69,8 +69,10 @@ const Layout = async ({
       <div>
         <ToFeedButton />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 md:gap-x-4 py-6">
-          <div className="flex flex-col col-span-2 space-y-6">{children}</div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 md:gap-x-4 pt-1 pb-6">
+          <div className="flex flex-col col-span-2 sm:space-y-6">
+            {children}
+          </div>
 
           {/* Menu on mobile? */}
           <div className="hidden md:block overflow-hidden h-fit rounded-lg border border-gray-200 order-first md:order-last">

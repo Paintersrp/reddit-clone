@@ -31,7 +31,7 @@ const Thread: FC<ThreadProps> = ({
   const threadRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="rounded-md bg-white shadow">
+    <div className="sm:rounded-md bg-white shadow">
       <div className="px-6 py-4 flex justify-between">
         <VoteClient
           threadId={thread.id}
