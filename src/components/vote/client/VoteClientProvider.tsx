@@ -1,28 +1,41 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { usePrevious } from "@mantine/hooks";
-import { ArrowBigDown, ArrowBigUp } from "lucide-react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { VoteType } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
+import { usePrevious } from "@mantine/hooks";
 
-import { toast, useAuthToast } from "@/hooks";
 import { ThreadVoteRequest } from "@/lib/validators/vote";
-import { cn } from "@/lib/utils";
-import { Button } from "../ui/Button";
+import { toast, useAuthToast } from "@/hooks";
 
-interface VoteClientProps {
+interface VoteContextType {
+  vote: (type: VoteType) => void;
+  votesAmt: number;
+  currentVote: "UP" | "DOWN" | null | undefined;
+}
+
+const VoteContext = createContext<VoteContextType | undefined>(undefined);
+
+export const useVote = () => {
+  const context = useContext(VoteContext);
+  if (context === undefined) {
+    throw new Error("useVote must be used within a VoteClientProvider");
+  }
+  return context;
+};
+
+interface VoteClientProviderProps {
   threadId: string;
   initialVotesAmt: number;
   initialVote?: "UP" | "DOWN" | null;
+  children: React.ReactNode;
 }
 
-const VoteClient = ({
+export const VoteClientProvider: React.FC<VoteClientProviderProps> = ({
   threadId,
   initialVotesAmt,
   initialVote,
-}: VoteClientProps) => {
+  children,
+}) => {
   const { loginToast } = useAuthToast();
   const [votesAmt, setVotesAmt] = useState<number>(initialVotesAmt);
   const [currentVote, setCurrentVote] = useState(initialVote);
@@ -83,37 +96,12 @@ const VoteClient = ({
     },
   });
 
-  return (
-    <div className="flex flex-col gap-0 md:gap-4 pr-6 sm:w-20 pb-4 sm:pb-0">
-      <Button
-        onClick={() => vote("UP")}
-        size="sm"
-        variant="ghost"
-        aria-label="upvote"
-      >
-        <ArrowBigUp
-          className={cn("h-5 w-5 text-zinc-700", {
-            "text-emerald-500 fill-emerald-500": currentVote === "UP",
-          })}
-        />
-      </Button>
-      <p className="text-center py-2 font-medium text-sm text-zinc-900">
-        {votesAmt}
-      </p>
-      <Button
-        onClick={() => vote("DOWN")}
-        size="sm"
-        variant="ghost"
-        aria-label="downvote"
-      >
-        <ArrowBigDown
-          className={cn("h-5 w-5 text-zinc-700", {
-            "text-red-500 fill-red-500": currentVote === "DOWN",
-          })}
-        />
-      </Button>
-    </div>
-  );
-};
+  // Context value
+  const value = {
+    vote,
+    votesAmt,
+    currentVote,
+  };
 
-export default VoteClient;
+  return <VoteContext.Provider value={value}>{children}</VoteContext.Provider>;
+};

@@ -26,6 +26,7 @@ export const tallyVoteScoreAndCache = async (
       title: thread.title,
       currentVote: voteType,
       createdAt: thread.createdAt,
+      _count: thread._count,
     };
 
     await redis.hset(`thread:${thread.id}`, cachePayload);

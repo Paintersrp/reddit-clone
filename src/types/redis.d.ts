@@ -8,4 +8,5 @@ export type CachedThread = {
   content: string;
   currentVote: VoteType | null;
   createdAt: Date;
+  _count: Prisma.ThreadCountOutputType;
 };

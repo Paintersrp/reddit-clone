@@ -39,6 +39,7 @@ const Page = async ({ params }: PageProps) => {
           votes: true,
           comments: true,
           subhive: true,
+          _count: true,
         },
         orderBy: { createdAt: "desc" },
         take: INFINITE_SCROLLING_PER_PAGE,

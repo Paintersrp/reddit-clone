@@ -36,6 +36,7 @@ export async function PATCH(req: Request) {
       include: {
         author: true,
         votes: true,
+        _count: true,
       },
     });
 

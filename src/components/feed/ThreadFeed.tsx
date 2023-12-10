@@ -5,18 +5,23 @@ import { FC, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useIntersection } from "@mantine/hooks";
+import { Loader2 } from "lucide-react";
 
 import { ExtendedThreads } from "@/types/db";
 import { INFINITE_SCROLLING_PER_PAGE } from "@/config";
 import Thread from "../threads/Thread";
-import { Loader2 } from "lucide-react";
 
 interface ThreadFeedProps {
   initialThreads: ExtendedThreads[];
   subhiveName?: string;
+  all?: boolean;
 }
 
-const ThreadFeed: FC<ThreadFeedProps> = ({ initialThreads, subhiveName }) => {
+const ThreadFeed: FC<ThreadFeedProps> = ({
+  initialThreads,
+  subhiveName,
+  all,
+}) => {
   const lastPostRef = useRef<HTMLElement>(null);
 
   const { ref, entry } = useIntersection({
@@ -29,9 +34,19 @@ const ThreadFeed: FC<ThreadFeedProps> = ({ initialThreads, subhiveName }) => {
   const { data, fetchNextPage, isFetchingNextPage } = useInfiniteQuery(
     ["inf-query"],
     async ({ pageParam = 1 }) => {
-      const query =
-        `/api/threads?limit=${INFINITE_SCROLLING_PER_PAGE}&page=${pageParam}` +
-        (!!subhiveName ? `&subhiveName=${subhiveName}` : "");
+      let base: string = "";
+
+      if (all) {
+        base = "/api/threads/all?";
+      } else {
+        base = "/api/threads?";
+      }
+
+      const limit = `limit=${INFINITE_SCROLLING_PER_PAGE}`;
+      const page = `&page=${pageParam}`;
+      const subhive = !!subhiveName ? `&subhiveName=${subhiveName}` : "";
+
+      const query = `${base}${limit}${page}${subhive}`;
 
       const { data } = await axios.get(query);
 
@@ -55,13 +70,11 @@ const ThreadFeed: FC<ThreadFeedProps> = ({ initialThreads, subhiveName }) => {
   const threads = data?.pages.flatMap((page) => page) ?? initialThreads;
 
   return (
-    <ul className="flex flex-col col-span-2 sm:space-y-6">
+    <ul className="flex flex-col col-span-2 sm:space-y-6 sm:mt-0">
       {threads.map((thread, index) => {
         const votesAmt = thread.votes.reduce((acc, vote) => {
           if (vote.type === "UP") return acc + 1;
-
           if (vote.type === "DOWN") return acc - 1;
-
           return acc;
         }, 0);
 

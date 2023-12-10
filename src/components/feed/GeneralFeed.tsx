@@ -12,6 +12,7 @@ const GeneralFeed = async () => {
       author: true,
       comments: true,
       subhive: true,
+      _count: true,
     },
     take: INFINITE_SCROLLING_PER_PAGE,
   });

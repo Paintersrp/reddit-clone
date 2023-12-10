@@ -17,17 +17,18 @@ const CreateThread: FC<CreateThreadProps> = ({ session }) => {
   const pathname = usePathname();
 
   return (
-    <div className="overflow-hidden sm:rounded-md mb-4 sm:mb-0 bg-white shadow">
-      <div className="h-full px-6 py-4 flex justify-between gap-6 flex-wrap md:flex-nowrap">
-        <div className="relative">
+    <div className="overflow-hidden sm:rounded-md mb-0 sm:mb-4 bg-white shadow sm:border-0 border-b border-zinc-200">
+      <div className="h-full px-2 sm:px-6 py-2 sm:py-4 flex flex-row justify-between items-center gap-3 md:gap-6">
+        <div className="relative mr-1">
           <UserAvatar
+            className="h-8 w-8 sm:h-10 sm:w-10"
             user={{
               name: session?.user.name || null,
               image: session?.user.image || null,
             }}
           />
 
-          <span className="absolute bottom-0 right-0 rounded-full w-3 h-3 bg-green-500 outline outline-2 outline-white" />
+          <span className="absolute bottom-0 right-0 rounded-full w-2 h-2 sm:w-3 sm:h-3 bg-green-500 outline outline-2 outline-white" />
         </div>
         <Input
           onClick={() => router.push(pathname + "/submit")}
@@ -37,12 +38,14 @@ const CreateThread: FC<CreateThreadProps> = ({ session }) => {
         <Button
           onClick={() => router.push(pathname + "/submit")}
           variant="ghost"
+          size="sm"
         >
           <ImageIcon className="text-zinc-600" />
         </Button>
         <Button
           onClick={() => router.push(pathname + "/submit")}
           variant="ghost"
+          size="sm"
         >
           <Link2 className="text-zinc-600" />
         </Button>

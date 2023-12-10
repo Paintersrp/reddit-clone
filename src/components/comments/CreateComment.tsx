@@ -23,7 +23,6 @@ const CreateComment: FC<CreateCommentProps> = ({ threadId, replyToId }) => {
   const { loginToast } = useAuthToast();
 
   const mutationFn = async ({ threadId, text, replyToId }: CommentRequest) => {
-    console.log(replyToId);
     const payload: CommentRequest = {
       threadId,
       text,
@@ -62,8 +61,10 @@ const CreateComment: FC<CreateCommentProps> = ({ threadId, replyToId }) => {
 
   return (
     <div className="grid w-full gap-1.5">
-      <Label htmlFor="comment">Your comment</Label>
-      <div className="mt-2">
+      <Label htmlFor="comment" className="text-sm">
+        Your comment
+      </Label>
+      <div className="mt-">
         <Textarea
           id="comment"
           value={input}

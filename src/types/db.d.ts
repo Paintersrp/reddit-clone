@@ -12,6 +12,7 @@ export type ExtendedThreads = Thread & {
   votes: Vote[];
   author: User;
   comments: Comment[];
+  _count: Prisma.ThreadCountOutputType;
 };
 
 export type ExtendedComment = Comment & {
@@ -22,4 +23,5 @@ export type ExtendedComment = Comment & {
 export type JoinedThread = Thread & {
   author: User;
   votes: Vote[];
+  _count: Prisma.ThreadCountOutputType;
 };

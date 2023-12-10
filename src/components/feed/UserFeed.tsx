@@ -42,6 +42,7 @@ const UserFeed = async ({ session }: UserFeedProps) => {
       author: true,
       comments: true,
       subhive: true,
+      _count: true,
     },
     take: INFINITE_SCROLLING_PER_PAGE,
   });

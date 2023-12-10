@@ -3,21 +3,21 @@ import { notFound } from "next/navigation";
 
 import { getAuthSession } from "@/lib/auth";
 import { tallyVoteScore } from "@/lib/tally";
-import VoteClient from "./VoteClient";
+import VoteServer from "./VoteServer";
 
-interface VoteServerProps {
+interface VoteServerWrapperProps {
   threadId: string;
   initialVotesAmt?: number;
   initialVote?: VoteType | null;
   getData?: () => Promise<(Thread & { votes: Vote[] }) | null>;
 }
 
-const VoteServer = async ({
+const VoteServerWrapper = async ({
   threadId,
   initialVotesAmt,
   initialVote,
   getData,
-}: VoteServerProps) => {
+}: VoteServerWrapperProps) => {
   const session = await getAuthSession();
 
   let _votesAmt: number = 0;
@@ -38,7 +38,7 @@ const VoteServer = async ({
   }
 
   return (
-    <VoteClient
+    <VoteServer
       threadId={threadId}
       initialVotesAmt={_votesAmt}
       initialVote={_currentVote}
@@ -46,4 +46,4 @@ const VoteServer = async ({
   );
 };
 
-export default VoteServer;
+export default VoteServerWrapper;

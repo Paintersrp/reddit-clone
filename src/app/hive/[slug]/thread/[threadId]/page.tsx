@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { Loader2, MessageSquare } from "lucide-react";
 
 import { db } from "@/lib/db";
 import { getAuthSession } from "@/lib/auth";
@@ -9,7 +9,7 @@ import { ExtendedThreads } from "@/types/db";
 import { CachedThread } from "@/types/redis";
 import { formatTimeToNow } from "@/lib/utils";
 
-import VoteServer from "@/components/vote/VoteServer";
+import VoteServerWrapper from "@/components/vote/server/VoteServerWrapper";
 import VoteSkeleton from "@/components/vote/VoteSkeleton";
 import EditorOutput from "@/components/editor/EditorOutput";
 import Comments from "@/components/comments/Comments";
@@ -42,6 +42,7 @@ const Page = async ({ params }: PageProps) => {
       include: {
         votes: true,
         author: true,
+        _count: true,
       },
     });
   }
@@ -62,6 +63,7 @@ const Page = async ({ params }: PageProps) => {
   return (
     <div className="h-full flex flex-col sm:flex-row items-center sm:items-start justify-between">
       {/* Thread Header */}
+
       <div className="sm:w-0 w-full flex-1 bg-white p-4 md:rounded-sm">
         {thread?.authorId === session?.user.id && (
           <div className="flex justify-end mb-1">
@@ -76,25 +78,26 @@ const Page = async ({ params }: PageProps) => {
         )}
 
         <div className="flex flex-row w-full">
-          <div className="flex w-full">
+          <div className="flex w-full pb-2">
             {/* Suspense shows skeleton of votes, avoiding waiting on cache miss */}
             <Suspense fallback={<VoteSkeleton />}>
               {/* @ts-expect-error Server Component */}
-              <VoteServer
+              <VoteServerWrapper
                 threadId={thread?.id ?? cachedThread.id}
                 getData={getVoteData}
               />
             </Suspense>
 
             <div>
-              <p className="max-h-40 mt-1 truncate text-sm text-gray-500">
+              <p className="max-h-40 mt-1 truncate text-xs sm:text-sm text-gray-500">
                 Created by u/
                 {thread?.author?.username ?? cachedThread.authorUsername} {"  "}
+                <span className="px-1">•</span>
                 {formatTimeToNow(
                   new Date(thread?.createdAt ?? cachedThread.createdAt)
                 )}
               </p>
-              <h1 className="text-xl font-semibold py-2 leading-6 text-gray-900">
+              <h1 className="text-lg sm:text-xl font-semibold py-2 leading-6 text-gray-900">
                 {thread?.title ?? cachedThread.title}
               </h1>
             </div>
@@ -102,7 +105,17 @@ const Page = async ({ params }: PageProps) => {
         </div>
 
         {/* Thread Content */}
-        <EditorOutput content={thread?.content ?? cachedThread.content} />
+        <div className="flex flex-col gap-4 prose whitespace-pre-wrap pb-4">
+          <EditorOutput content={thread?.content ?? cachedThread.content} />
+        </div>
+
+        <div className="w-fit flex items-center gap-2 text-black !rounded-full !bg-zinc-50 !border border-zinc-100 !p-2">
+          <MessageSquare className="w-[14px] h-[14px] text-black" />
+          <span className="text-xs font-medium">
+            {thread?._count.comments} {"  "}
+            comments
+          </span>
+        </div>
 
         {/* Thread Comments */}
         <Suspense

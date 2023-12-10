@@ -23,7 +23,7 @@ const UserMenu: FC<UserMenuProps> = ({ user }) => {
     <DropdownMenu>
       <DropdownMenuTrigger>
         <UserAvatar
-          className="h-8 w-8"
+          className="h-8 w-8 mr-2 sm:mr-0 ml-1 sm:ml-0"
           user={{ name: user.name || null, image: user.image || null }}
         />
       </DropdownMenuTrigger>
