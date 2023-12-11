@@ -4,7 +4,6 @@ import { Session } from "next-auth";
 import { type Comment as CommentType, CommentVote, User } from "@prisma/client";
 import { FC } from "react";
 
-import { tallyVoteScore } from "@/lib/tally";
 import CollapsibleComment from "./CollapsibleComment";
 
 interface CommentWithRepliesProps {
@@ -27,7 +26,6 @@ const CommentWithReplies: FC<CommentWithRepliesProps> = ({
   session,
   threadId,
 }) => {
-  const topLevelCommentVotesAmt = tallyVoteScore(comment);
   const topLevelCommentVote = comment.votes.find(
     (vote) => vote.userId === session?.user.id
   );
@@ -36,7 +34,7 @@ const CommentWithReplies: FC<CommentWithRepliesProps> = ({
     <div className="flex flex-col">
       <CollapsibleComment
         threadId={threadId}
-        votesAmt={topLevelCommentVotesAmt}
+        votesAmt={comment.score}
         currentVote={topLevelCommentVote}
         comment={comment}
         session={session}

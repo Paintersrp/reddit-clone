@@ -17,19 +17,30 @@ const Comments = async ({ threadId }: CommentsProps) => {
       threadId,
       replyToId: null,
     },
+    orderBy: {
+      score: "desc",
+    },
     include: {
       author: true,
       votes: true,
-
       replies: {
+        orderBy: {
+          score: "desc",
+        },
         include: {
           author: true,
           votes: true,
           replies: {
+            orderBy: {
+              score: "desc",
+            },
             include: {
               author: true,
               votes: true,
               replies: {
+                orderBy: {
+                  score: "desc",
+                },
                 include: {
                   votes: true,
                   author: true,
