@@ -1,169 +1,134 @@
 /* eslint-disable no-console */
 const { PrismaClient } = require("@prisma/client");
-const { faker } = require("@faker-js/faker");
-
 const prisma = new PrismaClient();
 
-async function load() {
-  const users = await seedUsers(20);
-  console.log("Users Seeded");
+const tallyVoteScore = (content: any) => {
+  return content.votes.reduce((acc: any, vote: any) => {
+    if (vote.type === "UP") return acc + 1;
+    if (vote.type === "DOWN") return acc - 1;
+    return acc;
+  }, 0);
+};
 
-  await seedSubhives(20, users);
-  console.log("Subhives Seeded");
+async function seedThreadVotes(users: any) {
+  const threads = await prisma.thread.findMany();
+  const totalUsers = users.length;
 
-  await seedThreads(50, users);
-  console.log("Threads Seeded");
+  for (let i = 0; i < totalUsers; i++) {
+    const user = users[i];
+    console.log(
+      `Processing thread votes for user ${i + 1}/${totalUsers} (${user.id})`
+    );
 
-  await seedComments(75, users);
-  console.log("Comments Seeded");
-}
+    for (const thread of threads) {
+      const voteType = Math.random() < 0.8 ? "UP" : "DOWN";
 
-async function seedUsers(count: number) {
-  let users = [];
-  for (let i = 0; i < count; i++) {
-    const user = await prisma.user.create({
-      data: {
-        email: faker.internet.email(),
-        name: faker.person.fullName(),
-        username: faker.internet.userName(),
-      },
-    });
-    users.push(user);
-  }
-  return users;
-}
-
-async function seedSubhives(count: number, users: any[]): Promise<void> {
-  const generatedNames = new Set<string>();
-  for (let i = 0; i < count; i++) {
-    const user = faker.helpers.arrayElement(users);
-    let uniqueName = faker.word.sample();
-
-    // Ensure uniqueness of the name
-    while (generatedNames.has(uniqueName)) {
-      uniqueName = faker.word.sample();
-    }
-
-    generatedNames.add(uniqueName);
-
-    await prisma.subhive.create({
-      data: {
-        name: uniqueName,
-        creatorId: user.id,
-      },
-    });
-  }
-}
-
-const codeSnippets = [
-  `const x = ${faker.number.int()};`,
-  `let y = '${faker.lorem.word()}';`,
-  `function myFunc() { return ${faker.datatype.boolean()}; }`,
-  `if (${faker.datatype.boolean()}) { console.log('${faker.lorem.sentence()}'); }`,
-  `const arr = [${faker.word.sample()}, ${faker.word.sample()}];`,
-];
-
-// Seed Threads
-async function seedThreads(count: number, users: any[]): Promise<void> {
-  const subhives = await prisma.subhive.findMany();
-  const codeBlocks = faker.helpers.shuffle(codeSnippets);
-
-  for (let i = 0; i < count; i++) {
-    const user = faker.helpers.arrayElement(users);
-    const subhive = faker.helpers.arrayElement(subhives);
-
-    const blocks: any = [
-      {
-        type: "paragraph",
-        data: {
-          text: faker.lorem.paragraphs(faker.number.int({ min: 1, max: 3 })),
-        },
-      },
-    ];
-
-    if (i < codeBlocks.length) {
-      blocks.push({
-        type: "code",
-        data: {
-          code: codeBlocks[i],
+      const existingVote = await prisma.vote.findFirst({
+        where: {
+          userId: user.id,
+          threadId: thread.id,
         },
       });
-    }
 
-    const blockTypes = ["list", "linkTool"];
-    const selectedBlockTypes = faker.helpers
-      .shuffle(blockTypes)
-      .slice(0, faker.number.int({ min: 1, max: blockTypes.length }));
+      if (!existingVote) {
+        await prisma.vote.create({
+          data: {
+            userId: user.id,
+            threadId: thread.id,
+            type: voteType,
+          },
+        });
 
-    for (const type of selectedBlockTypes) {
-      switch (type) {
-        case "list":
-          blocks.push({
-            type: "list",
-            data: {
-              style: "ordered",
-              items: [
-                faker.commerce.productName(),
-                faker.commerce.productName(),
-                faker.commerce.productName(),
-              ],
-            },
-          });
-          break;
-        case "linkTool":
-          blocks.push({
-            type: "linkTool",
-            data: {
-              link: faker.internet.url(),
-              meta: {
-                title: faker.company.catchPhrase(),
-                description: faker.lorem.sentence(),
-              },
-            },
-          });
-          break;
+        const threadAfterUpdate = await prisma.thread.findFirst({
+          where: { id: thread.id },
+          include: { votes: true },
+        });
+
+        const score = tallyVoteScore(threadAfterUpdate);
+
+        await prisma.thread.update({
+          where: {
+            id: thread.id,
+          },
+          data: {
+            score,
+          },
+        });
       }
     }
-
-    const content = {
-      time: new Date().getTime(),
-      blocks: blocks,
-      version: "2.27.0",
-    };
-
-    await prisma.thread.create({
-      data: {
-        title: faker.company.buzzVerb(),
-        content: content,
-        subhiveId: subhive.id,
-        authorId: user.id,
-      },
-    });
   }
 }
 
-// Seed Comments and Nested Comments
-async function seedComments(count: number, users: any[]): Promise<void> {
-  const threads = await prisma.thread.findMany();
-  for (let i = 0; i < count; i++) {
-    const user = faker.helpers.arrayElement(users);
-    const thread = faker.helpers.arrayElement(threads);
-    let parentCommentId: string | null = null;
+async function seedCommentVotes(users: any) {
+  const comments = await prisma.comment.findMany();
+  const totalUsers = users.length;
 
-    // Create a chain of nested comments
-    for (let j = 0; j < faker.number.int({ min: 1, max: 5 }); j++) {
-      // Nested up to 5 levels
-      const comment: any = await prisma.comment.create({
-        data: {
-          text: faker.lorem.sentences(2),
-          threadId: thread.id,
-          authorId: user.id,
-          replyToId: parentCommentId,
+  for (let i = 0; i < totalUsers; i++) {
+    const user = users[i];
+    console.log(
+      `Processing comment votes for user ${i + 1}/${totalUsers} (${user.id})`
+    );
+
+    for (let j = 0; j < comments.length; j++) {
+      const comment = comments[j];
+      const voteType = Math.random() < 0.8 ? "UP" : "DOWN";
+
+      if (j % 10 === 0) {
+        console.log(
+          `--> User ${i + 1}: Processing comment ${j + 1}/${comments.length}`
+        );
+      }
+
+      const existingVote = await prisma.commentVote.findFirst({
+        where: {
+          userId: user.id,
+          commentId: comment.id,
         },
       });
 
-      parentCommentId = comment.id; // The next comment will reply to this one
+      if (!existingVote) {
+        await prisma.commentVote.create({
+          data: {
+            userId: user.id,
+            commentId: comment.id,
+            type: voteType,
+          },
+        });
+
+        const commentAfterUpdate = await prisma.comment.findFirst({
+          where: { id: comment.id },
+          include: { votes: true },
+        });
+
+        const score = tallyVoteScore(commentAfterUpdate);
+
+        await prisma.comment.update({
+          where: {
+            id: comment.id,
+          },
+          data: {
+            score,
+          },
+        });
+      }
     }
+  }
+}
+
+async function load() {
+  const users = await prisma.user.findMany();
+  console.log(`Loaded ${users.length} users`);
+
+  // Check if users are available to proceed with voting
+  if (users.length > 0) {
+    // Seed other entities based on the users
+    await seedThreadVotes(users);
+    console.log("Thread Votes Seeded");
+
+    await seedCommentVotes(users);
+    console.log("Comment Votes Seeded");
+  } else {
+    console.log("No users found. Seed users first before seeding votes.");
   }
 }
 

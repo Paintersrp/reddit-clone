@@ -98,6 +98,7 @@ model Thread {
 
   comments Comment[]
   votes    Vote[]
+  score    Int       @default(0)
 }
 
 model Comment {
@@ -118,6 +119,7 @@ model Comment {
 
   votes     CommentVote[]
   commentId String?
+  score     Int           @default(0)
 }
 
 enum VoteType {

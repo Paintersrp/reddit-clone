@@ -4,14 +4,16 @@ import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 
 export async function GET(req: Request) {
-  const url = new URL(req.url);
+  // Get search parameters from url
+  const { searchParams } = new URL(req.url);
+
+  // Mutatable array to hold a user's followed communities, if user exists
+  let followedCommunitiesIds: string[] = [];
 
   // Get session, if it exists
   const session = await getAuthSession();
 
-  let followedCommunitiesIds: string[] = [];
-
-  // If we have a user session, get their followed communities
+  // If we have a user session, get their followed community ids
   if (session) {
     const followedCommunities = await db.subscription.findMany({
       where: {
@@ -39,13 +41,13 @@ export async function GET(req: Request) {
         subhiveName: z.string().nullish().optional(),
       })
       .parse({
-        limit: url.searchParams.get("limit"),
-        page: url.searchParams.get("page"),
-        subhiveName: url.searchParams.get("subhiveName"),
+        limit: searchParams.get("limit"),
+        page: searchParams.get("page"),
+        subhiveName: searchParams.get("subhiveName"),
       });
 
     if (subhiveName) {
-      // If we have a subhive name, we use it to filter
+      // If we have a subhive name, we use it to filter in the where clause
       whereClause = {
         subhive: {
           name: subhiveName,
@@ -81,6 +83,7 @@ export async function GET(req: Request) {
       where: whereClause,
     });
 
+    // Return threads
     return new Response(JSON.stringify(threads));
   } catch (error) {
     // Handle validation error

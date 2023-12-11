@@ -133,8 +133,6 @@ const Comment: FC<CommentProps> = ({
     onSuccess: deleteSuccess,
   });
 
-  console.log(session?.user.id === comment.authorId);
-
   return (
     <div ref={commentRef} className="flex flex-col">
       <div className="flex w-full items-center justify-between">

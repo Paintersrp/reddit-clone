@@ -1,11 +1,14 @@
 import { db } from "@/lib/db";
 
 export async function GET(req: Request) {
-  const url = new URL(req.url);
-  const query = url.searchParams.get("q");
+  // Extract search parameters from url and check for query
+  const { searchParams } = new URL(req.url);
+  const query = searchParams.get("q");
 
+  // Handle requests with no search query
   if (!query) return new Response("Invalid query", { status: 400 });
 
+  // Search for threads containing the query
   const threadResults = await db.thread.findMany({
     where: {
       title: {
@@ -19,6 +22,7 @@ export async function GET(req: Request) {
     take: 10,
   });
 
+  // Search for subhives containing the query
   const hiveResults = await db.subhive.findMany({
     where: {
       name: {
@@ -31,10 +35,12 @@ export async function GET(req: Request) {
     take: 10,
   });
 
+  // Combined search results
   const results = {
     threads: threadResults,
     hives: hiveResults,
   };
 
+  // Return response of search results
   return new Response(JSON.stringify(results));
 }

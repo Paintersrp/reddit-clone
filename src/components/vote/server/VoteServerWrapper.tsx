@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getAuthSession } from "@/lib/auth";
 import { tallyVoteScore } from "@/lib/tally";
 import VoteServer from "./VoteServer";
+import { db } from "@/lib/db";
 
 interface VoteServerWrapperProps {
   threadId: string;
@@ -32,6 +33,16 @@ const VoteServerWrapper = async ({
     _currentVote = thread.votes.find(
       (vote) => vote.userId === session?.user.id
     )?.type;
+
+    await db.thread.update({
+      where: {
+        id: thread.id,
+      },
+      data: {
+        score: _votesAmt,
+      },
+    });
+    
   } else {
     _votesAmt = initialVotesAmt!;
     _currentVote = initialVote!;

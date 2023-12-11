@@ -3,18 +3,18 @@ import { z } from "zod";
 import { CommentVoteValidator } from "@/lib/validators/vote";
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { tallyVoteScore } from "@/lib/tally";
 
 export async function PATCH(req: Request) {
   try {
+    // Get and validate request body
     const body = await req.json();
-
-    // Validate request body
     const { commentId, voteType } = CommentVoteValidator.parse(body);
 
     // Get session, if it exists
     const session = await getAuthSession();
 
-    // If no user, return 401 Unauthorized
+    // If no user, return unauthorized response
     if (!session?.user) {
       return new Response("Unauthorized", { status: 401 });
     }
@@ -39,6 +39,22 @@ export async function PATCH(req: Request) {
           },
         });
 
+        const comment = await db.comment.findFirst({
+          where: { id: commentId },
+          include: { votes: true },
+        });
+
+        const voteAmt = await tallyVoteScore(comment);
+
+        await db.comment.update({
+          where: {
+            id: commentId,
+          },
+          data: {
+            score: voteAmt,
+          },
+        });
+
         return new Response("OK");
       }
 
@@ -55,6 +71,22 @@ export async function PATCH(req: Request) {
         },
       });
 
+      const comment = await db.comment.findFirst({
+        where: { id: commentId },
+        include: { votes: true },
+      });
+
+      const voteAmt = await tallyVoteScore(comment);
+
+      await db.comment.update({
+        where: {
+          id: commentId,
+        },
+        data: {
+          score: voteAmt,
+        },
+      });
+
       return new Response("OK");
     }
 
@@ -64,6 +96,22 @@ export async function PATCH(req: Request) {
         type: voteType,
         userId: session.user.id,
         commentId,
+      },
+    });
+
+    const comment = await db.comment.findFirst({
+      where: { id: commentId },
+      include: { votes: true },
+    });
+    
+    const voteAmt = await tallyVoteScore(comment);
+
+    await db.comment.update({
+      where: {
+        id: commentId,
+      },
+      data: {
+        score: voteAmt,
       },
     });
 

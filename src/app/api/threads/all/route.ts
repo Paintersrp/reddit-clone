@@ -2,37 +2,47 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 
 export async function GET(req: Request) {
-  const url = new URL(req.url);
+  const { searchParams } = new URL(req.url);
 
   try {
     // Parse query parameters
-    const { limit, page, sortField, sortOrder } = z
+    const { limit, page, sortType, sortOrder } = z
       .object({
         limit: z.string(),
         page: z.string(),
-        sortField: z.string().optional(),
+        sortType: z.enum(["top", "date"]).optional(),
         sortOrder: z.enum(["asc", "desc"]).optional(),
       })
       .parse({
-        limit: url.searchParams.get("limit") ?? 10,
-        page: url.searchParams.get("page") ?? 1,
-        sortField: url.searchParams.get("sortField") ?? "",
-        sortOrder: url.searchParams.get("sortOrder") ?? "desc",
+        limit: searchParams.get("limit") ?? 10,
+        page: searchParams.get("page") ?? 1,
+        sortType: searchParams.get("sortType") ?? "top",
+        sortOrder: searchParams.get("sortOrder") ?? "desc",
       });
 
-    // Default sort
-    const defaultSort = { createdAt: "desc" };
-    let orderBy: any = defaultSort;
+    // Number of threads to return
+    const take = parseInt(limit);
 
-    // Custom sort
-    if (sortField && sortOrder) {
-      orderBy = { [sortField]: sortOrder };
+    // Number of threads to skip before beginning to take
+    const skip = (parseInt(page) - 1) * take;
+
+    // Direction to sort the createdAt by
+    let orderBy = {};
+
+    if (sortType === "date") {
+      orderBy = { createdAt: sortOrder };
+    } else if (sortType === "top") {
+      orderBy = {
+        votes: {
+          _count: sortOrder,
+        },
+      };
     }
 
-    // Fetch threads
+    // Find threads based on query parameters
     const threads = await db.thread.findMany({
-      take: parseInt(limit),
-      skip: (parseInt(page) - 1) * parseInt(limit),
+      take,
+      skip,
       orderBy,
       include: {
         subhive: true,
@@ -45,10 +55,12 @@ export async function GET(req: Request) {
 
     return new Response(JSON.stringify(threads));
   } catch (error) {
-    // Error handling
+    // Handle validation error
     if (error instanceof z.ZodError) {
       return new Response("Invalid request data passed", { status: 422 });
     }
+
+    // Handle general error
     return new Response("Could not fetch threads", { status: 500 });
   }
 }

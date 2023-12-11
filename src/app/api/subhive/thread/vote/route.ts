@@ -7,15 +7,14 @@ import { db } from "@/lib/db";
 
 export async function PATCH(req: Request) {
   try {
+    // Get and validate request body
     const body = await req.json();
-
-    // Validate request body
     const { threadId, voteType } = ThreadVoteValidator.parse(body);
 
     // Get session, if it exists
     const session = await getAuthSession();
 
-    // If no user, return 401 Unauthorized
+    // If no user, return unauthorized response
     if (!session?.user) {
       return new Response("Unauthorized", { status: 401 });
     }
@@ -28,23 +27,6 @@ export async function PATCH(req: Request) {
       },
     });
 
-    // Fetch current thread for caching with joins
-    const thread = await db.thread.findUnique({
-      where: {
-        id: threadId,
-      },
-      include: {
-        author: true,
-        votes: true,
-        _count: true,
-      },
-    });
-
-    // Handles any case of no threads, if somehow occured
-    if (!thread) {
-      return new Response("Thread not found", { status: 404 });
-    }
-
     if (existingVote) {
       // If the user's current vote is the same as the incoming request voteType, we delete it
       if (existingVote.type === voteType) {
@@ -54,6 +36,31 @@ export async function PATCH(req: Request) {
               threadId,
               userId: session.user.id,
             },
+          },
+        });
+
+        // Finds current thread in db for scoring
+        const thread = await db.thread.findUnique({
+          where: {
+            id: threadId,
+          },
+          include: {
+            author: true,
+            votes: true,
+            _count: true,
+          },
+        });
+
+        // Checks new vote count and caches in Redis if necessary
+        const voteAmt = await tallyVoteScoreAndCache(thread!, voteType);
+
+        // Update thread vote score
+        await db.thread.update({
+          where: {
+            id: thread!.id,
+          },
+          data: {
+            score: voteAmt,
           },
         });
 
@@ -73,8 +80,29 @@ export async function PATCH(req: Request) {
         },
       });
 
+      const thread = await db.thread.findUnique({
+        where: {
+          id: threadId,
+        },
+        include: {
+          author: true,
+          votes: true,
+          _count: true,
+        },
+      });
+
       // Checks new vote count and caches in Redis if necessary
-      tallyVoteScoreAndCache(thread, voteType);
+      const voteAmt = await tallyVoteScoreAndCache(thread!, voteType);
+
+      // Update thread vote score
+      await db.thread.update({
+        where: {
+          id: thread!.id,
+        },
+        data: {
+          score: voteAmt,
+        },
+      });
 
       return new Response("OK");
     }
@@ -88,8 +116,30 @@ export async function PATCH(req: Request) {
       },
     });
 
+    // Finds current thread in db for scoring
+    const thread = await db.thread.findUnique({
+      where: {
+        id: threadId,
+      },
+      include: {
+        author: true,
+        votes: true,
+        _count: true,
+      },
+    });
+
     // Checks new vote count and caches in Redis if necessary
-    tallyVoteScoreAndCache(thread, voteType);
+    const voteAmt = await tallyVoteScoreAndCache(thread!, voteType);
+
+    // Update thread vote score
+    await db.thread.update({
+      where: {
+        id: thread!.id,
+      },
+      data: {
+        score: voteAmt,
+      },
+    });
 
     return new Response("OK");
   } catch (error) {

@@ -11,23 +11,22 @@ export async function GET(req: Request) {
     return new Response("Invalid href", { status: 400 });
   }
 
-  // GET link
+  // Send a request to the href
   const res = await axios.get(href);
 
-  
+  // Extract Title Metadata with regex
   const titleMatch = res.data.match(/<title>(.*?)<\/title>/);
   const title = titleMatch ? titleMatch[1] : "";
 
-  const descriptionMatch = res.data.match(
-    /<meta name="description" content="(.*?)"/
-  );
-  const description = descriptionMatch ? descriptionMatch[1] : "";
+  // Extract Title Metadata with regex
+  const descMatch = res.data.match(/<meta name="description" content="(.*?)"/);
+  const description = descMatch ? descMatch[1] : "";
 
-  const imageMatch = res.data.match(
-    /<meta property="og:image" content="(.*?)"/
-  );
-  const imageUrl = imageMatch ? imageMatch[1] : "";
+  // Extract Image Metadata with regex
+  const imgMatch = res.data.match(/<meta property="og:image" content="(.*?)"/);
+  const imageUrl = imgMatch ? imgMatch[1] : "";
 
+  // Return Metadata
   return new Response(
     JSON.stringify({
       success: 1,

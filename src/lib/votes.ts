@@ -31,4 +31,6 @@ export const tallyVoteScoreAndCache = async (
 
     await redis.hset(`thread:${thread.id}`, cachePayload);
   }
+
+  return votesAmt;
 };
