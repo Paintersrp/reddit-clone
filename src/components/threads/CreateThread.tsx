@@ -1,6 +1,6 @@
 "use client";
 
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Session } from "next-auth";
 import UserAvatar from "../ui/UserAvatar";
@@ -15,6 +15,16 @@ interface CreateThreadProps {
 const CreateThread: FC<CreateThreadProps> = ({ session }) => {
   const router = useRouter();
   const pathname = usePathname();
+
+  const [path, setPath] = useState(pathname);
+
+  useEffect(() => {
+    if (pathname === "/" || pathname === "/hive/all") {
+      setPath("");
+    } else {
+      setPath(pathname);
+    }
+  }, [pathname]);
 
   return (
     <div className="overflow-hidden sm:rounded-md mb-0 sm:mb-4 bg-white shadow sm:border-0 border-b border-zinc-200">
@@ -31,19 +41,21 @@ const CreateThread: FC<CreateThreadProps> = ({ session }) => {
           <span className="absolute bottom-0 right-0 rounded-full w-2 h-2 sm:w-3 sm:h-3 bg-green-500 outline outline-2 outline-white" />
         </div>
         <Input
-          onClick={() => router.push(pathname + "/submit")}
+          onClick={() => router.push(path + "/submit")}
           readOnly
           placeholder="Create thread"
         />
+
         <Button
-          onClick={() => router.push(pathname + "/submit")}
+          onClick={() => router.push(path + "/submit")}
           variant="ghost"
           size="sm"
         >
           <ImageIcon className="text-zinc-600" />
         </Button>
+
         <Button
-          onClick={() => router.push(pathname + "/submit")}
+          onClick={() => router.push(path + "/submit")}
           variant="ghost"
           size="sm"
         >

@@ -28,8 +28,11 @@ export async function POST(req: Request) {
 
     // Handle cases of user not being subscribed to the subhive while attempting to post
     if (!subscription) {
-      return new Response("Subscribe to subhive in order to post", {
-        status: 403,
+      await db.subscription.create({
+        data: {
+          subhiveId,
+          userId: session.user.id,
+        },
       });
     }
 

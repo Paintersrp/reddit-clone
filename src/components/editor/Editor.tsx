@@ -1,5 +1,6 @@
 "use client";
 
+import "@/styles/editor.css";
 import type EditorJS from "@editorjs/editorjs";
 
 import { FC, useCallback, useEffect, useRef, useState } from "react";
@@ -187,7 +188,7 @@ const Editor: FC<EditorProps> = ({ subhiveId }) => {
     <div className="w-full p-4 bg-zinc-50 rounded-lg border border-zinc-200">
       <form
         id="subhive-post-form"
-        className="w-fit"
+        className=""
         onSubmit={handleSubmit(onSubmit)}
       >
         <div className="prose prose-stone dark:prose-invert">
@@ -201,7 +202,7 @@ const Editor: FC<EditorProps> = ({ subhiveId }) => {
             placeholder="Title"
             className="w-full resize-none appearance-none overflow-hidden bg-transparent text-5xl font-bold focus:outline-none"
           />
-          <div id="editor" className="min-h-[500px]" />
+          <div id="editor" className="min-h-[300px]" />
           <p className="text-sm text-gray-500">
             Use{" "}
             <kbd className="rounded-md border bg-muted px-1 text-xs uppercase">

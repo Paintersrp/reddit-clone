@@ -4,8 +4,6 @@ import { db } from "@/lib/db";
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
 
-  console.log("here");
-
   try {
     // Parse query parameters
     const { limit, page, sortType, sortOrder } = z
@@ -52,8 +50,6 @@ export async function GET(req: Request) {
         _count: true,
       },
     });
-
-    console.log(threads);
 
     return new Response(JSON.stringify(threads));
   } catch (error) {

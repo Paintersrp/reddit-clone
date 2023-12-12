@@ -78,20 +78,20 @@ const DeleteThreadDialog: FC<DeleteThreadProps> = ({ threadId }) => {
             comments will remain.
           </DialogDescription>
         </DialogHeader>
-        <DialogFooter className="justify-end md:justify-end">
+        <DialogFooter className="gap-2 sm:gap-0 justify-end md:justify-end">
           <DialogClose asChild>
             <Button type="button">Close</Button>
           </DialogClose>
           <DialogClose asChild>
             <Button
-              className="text-red-600 hover:text-white transition-colors duration-200 ease-out font-semibold focus:ring-red-400 focus:outline-none focus:ring-2"
+              className="text-red-600 border border-red-600 hover:text-white transition-colors duration-200 ease-out font-semibold focus:ring-red-400 focus:outline-none focus:ring-2 focus:border-none"
               variant="destructive"
               isLoading={deleteLoading}
               onClick={() => deleteComment({ threadId })}
               type="button"
               autoFocus
             >
-              <p>Confirm</p>
+              Confirm
             </Button>
           </DialogClose>
         </DialogFooter>
