@@ -84,7 +84,7 @@ const UserNameForm: FC<UserNameFormProps> = ({ user }) => {
     >
       <Card className="mt-4">
         <CardHeader>
-          <CardTitle>Your username</CardTitle>
+          <CardTitle className="text-base sm:text-lg">Your username</CardTitle>
           <CardDescription>
             Please enter a display name you are comfortable with.
           </CardDescription>

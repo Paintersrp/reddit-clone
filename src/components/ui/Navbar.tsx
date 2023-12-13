@@ -6,6 +6,7 @@ import { buttonVariants } from "./Button";
 import { getAuthSession } from "@/lib/auth";
 import UserMenu from "../layout/UserMenu";
 import SearchBar from "./SearchBar";
+import GuestMenu from "../layout/GuestMenu";
 
 export const Navbar = async ({}) => {
   const session = await getAuthSession();
@@ -27,19 +28,7 @@ export const Navbar = async ({}) => {
         {/* Search */}
         <SearchBar />
 
-        {session?.user ? (
-          <UserMenu user={session.user} />
-        ) : (
-          <Link
-            href="/sign-in"
-            className={buttonVariants({
-              size: "sm",
-              className: "whitespace-nowrap text-sm mr-2 sm:mr-0 ml-1 sm:ml-0",
-            })}
-          >
-            Sign In
-          </Link>
-        )}
+        {session?.user ? <UserMenu user={session.user} /> : <GuestMenu />}
       </div>
     </div>
   );

@@ -70,8 +70,8 @@ const Page = () => {
   });
 
   return (
-    <div className="container flex items-center h-full max-w-3xl mx-auto">
-      <div className="relative bg-white w-full h-fit p-4 rounded-lg space-y-6">
+    <div className="sm:container flex items-center w-full h-full justify-center pt-[32px] sm:pt-[60px]">
+      <div className="relative max-w-3xl bg-white w-full h-fit p-4 rounded-lg space-y-6 m-2 sm:m-0">
         <div className="flex justify-between items-center">
           <h1 className="text-xl font-semibold">Create a hive</h1>
         </div>

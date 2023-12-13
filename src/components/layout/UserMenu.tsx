@@ -43,11 +43,21 @@ const UserMenu: FC<UserMenuProps> = ({ user }) => {
         <DropdownMenuSeparator />
 
         <DropdownMenuItem className="text-sm" asChild>
-          <Link href="/">Feed</Link>
+          <Link href="/">Your Feed</Link>
         </DropdownMenuItem>
+
+        <DropdownMenuItem className="text-sm" asChild>
+          <Link href="/all">All</Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
 
         <DropdownMenuItem asChild className="text-sm">
           <Link href="/hive/create">Create Community</Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem asChild className="text-sm">
+          <Link href="/submit">Create Thread</Link>
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild className="text-sm">
