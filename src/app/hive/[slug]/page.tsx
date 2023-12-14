@@ -41,9 +41,9 @@ const Page = async ({ params }: PageProps) => {
           subhive: true,
           _count: true,
         },
-        orderBy: { 
-          createdAt: "desc"
-         },
+        orderBy: {
+          createdAt: "desc",
+        },
         take: INFINITE_SCROLLING_PER_PAGE,
       },
     },

@@ -22,8 +22,8 @@ const Page = async ({ params }: PageProps) => {
   if (!subhive) return notFound();
 
   return (
-    <div className="flex flex-col items-start gap-6">
-      <div className="border-b border-gray-200 pb-5">
+    <div className="flex flex-col items-start gap-6 p-1.5 sm:p-0">
+      <div className="border-b border-gray-200 pb-5 w-full">
         <div className="-ml-2 -mt-2 flex flex-wrap items-baseline">
           <h3 className="ml-2 mt-2 text-base font-semibold leading-6 text-gray-900">
             Create Thread

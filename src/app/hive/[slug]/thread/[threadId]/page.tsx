@@ -1,20 +1,21 @@
-import { Suspense } from "react";
+import { MessageSquare } from "lucide-react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Loader2, MessageSquare } from "lucide-react";
+import { Suspense } from "react";
 
-import { db } from "@/lib/db";
 import { getAuthSession } from "@/lib/auth";
+import { db } from "@/lib/db";
 import { redis } from "@/lib/redis";
+import { formatTimeToNow } from "@/lib/utils";
 import { ExtendedThread } from "@/types/db";
 import { CachedThread } from "@/types/redis";
-import { formatTimeToNow } from "@/lib/utils";
 
-import VoteServerWrapper from "@/components/vote/server/VoteServerWrapper";
-import VoteSkeleton from "@/components/vote/VoteSkeleton";
-import EditorOutput from "@/components/editor/EditorOutput";
 import Comments from "@/components/comments/Comments";
+import EditorOutput from "@/components/editor/EditorOutput";
 import DeleteThreadDialog from "@/components/layout/DeleteThreadDialog";
-import Link from "next/link";
+import Loading from "@/components/layout/Loading";
+import VoteSkeleton from "@/components/vote/VoteSkeleton";
+import VoteServerWrapper from "@/components/vote/server/VoteServerWrapper";
 
 interface PageProps {
   params: {
@@ -125,9 +126,7 @@ const Page = async ({ params }: PageProps) => {
         </div>
 
         {/* Thread Comments */}
-        <Suspense
-          fallback={<Loader2 className="h-5 w-5 animate-spin text-zinc-500" />}
-        >
+        <Suspense fallback={<Loading />}>
           {/* @ts-expect-error Server Component */}
           <Comments threadId={thread?.id ?? cachedThread.id} />
         </Suspense>

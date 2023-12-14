@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Loader2, Scale } from "lucide-react";
-import { Subhive } from "@prisma/client";
+import { Scale } from "lucide-react";
 import axios from "axios";
+import { Subhive } from "@prisma/client";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/Button";
 import Editor from "@/components/editor/Editor";
 import EditorSkeleton from "@/components/editor/EditorSkeleton";
 import { Icons } from "@/components/ui/Icons";
+import { Label } from "@/components/ui/Label";
+import Loading from "@/components/layout/Loading";
 import {
   Select,
   SelectContent,
@@ -16,7 +18,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/Select";
-import { Label } from "@/components/ui/Label";
 
 const Page = () => {
   const [subhive, setSubhive] = useState<string>("");
@@ -106,9 +107,7 @@ const Page = () => {
                 </Select>
               </div>
             ) : (
-              <div className="flex justify-center">
-                <Loader2 className="w-6 h-6 text-zinc-500 animate-spin" />
-              </div>
+              <Loading />
             )}
 
             {!subhive ? <EditorSkeleton /> : <Editor subhiveId={subhive} />}

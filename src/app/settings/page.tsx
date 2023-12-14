@@ -14,7 +14,7 @@ const Page = async () => {
 
   return (
     <div className="max-w-4xl mx-auto py-12 p-1.5">
-      <div className="grid items-start gap-8">
+      <div className="grid items-start gap-8 mt-2 ml-2 sm:ml-0">
         <h1 className="font-bold text-2xl md:text-3xl">Settings</h1>
       </div>
 

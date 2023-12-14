@@ -1,7 +1,6 @@
 "use client";
 
 import axios from "axios";
-import { Loader2 } from "lucide-react";
 import { useIntersection } from "@mantine/hooks";
 import { useSession } from "next-auth/react";
 import { useInfiniteQuery } from "@tanstack/react-query";
@@ -12,6 +11,7 @@ import { ExtendedThread } from "@/types/db";
 import ExtendedFeed from "./ExtendedFeed";
 import FeedItem from "./FeedItem";
 import { FeedSortToolbar, type SortOptions } from "./FeedSortToolbar";
+import Loading from "../layout/Loading";
 
 interface ThreadFeedProps {
   initialThreads: ExtendedThread[];
@@ -125,18 +125,10 @@ const ThreadFeed: FC<ThreadFeedProps> = ({
         })}
 
         {/* Loading indicator when fetching more threads */}
-        {isFetchingNextPage && (
-          <div className="flex justify-center mt-2">
-            <Loader2 className="w-6 h-6 text-emerald-500 animate-spin" />
-          </div>
-        )}
+        {isFetchingNextPage && <Loading />}
 
         {/* Loading indicator when starting a query for threads */}
-        {isFetching && !isFetchingNextPage && (
-          <div className="flex justify-center mt-2">
-            <Loader2 className="w-6 h-6 text-emerald-500 animate-spin" />
-          </div>
-        )}
+        {isFetching && !isFetchingNextPage && <Loading />}
       </ul>
 
       {/* Once our original feed has been exhausted, we render an extended feed */}

@@ -29,13 +29,13 @@
     --destructive-foreground: 0 0% 98%;
 
     --warning: 38 92% 50%;
-    --warning-foreground: 0 100% 100%;
+    --warning-foreground: 0 0% 100%;
 
-    --success: 131 100% 38%;
-    --success-foreground: 0 100% 100%;
+    --success: 120 39% 49%; /* Example HSL for success */
+    --success-foreground: 0 0% 98%; /* Adjust as needed */
 
     --info: 209 100% 50%;
-    --info-foreground: 0 100% 100%;
+    --info-foreground: 0 0% 100%;
 
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;

@@ -3,7 +3,6 @@
 import type { ExtendedThread } from "@/types/db";
 
 import axios from "axios";
-import { Loader2 } from "lucide-react";
 import { useIntersection } from "@mantine/hooks";
 import { useSession } from "next-auth/react";
 import { useInfiniteQuery } from "@tanstack/react-query";
@@ -12,6 +11,7 @@ import { FC, useEffect, useRef, useState } from "react";
 import { INFINITE_SCROLLING_PER_PAGE } from "@/config";
 import FeedItem from "./FeedItem";
 import { FeedSortToolbar, SortOptions } from "./FeedSortToolbar";
+import Loading from "../layout/Loading";
 
 interface ExtendedFeedProps {
   originalFeedThreads: ExtendedThread[];
@@ -98,7 +98,7 @@ const ExtendedFeed: FC<ExtendedFeedProps> = ({
       {/* Display to denote end of original feed and beginning of extended feed */}
       <div className="my-6">
         <p className="text-center text-zinc-600 text-sm mb-2">
-          Personalized Feed has been exhausted
+          Personalized feed has been exhausted
         </p>
         <hr className="border-t border-zinc-300" />
         <p className="text-center text-zinc-600 text-sm mt-2">
@@ -128,18 +128,10 @@ const ExtendedFeed: FC<ExtendedFeedProps> = ({
         })}
 
         {/* Loading indicator when fetching more threads */}
-        {isFetchingNextPage && (
-          <div className="flex justify-center">
-            <Loader2 className="w-6 h-6 text-zinc-500 animate-spin" />
-          </div>
-        )}
+        {isFetchingNextPage && <Loading />}
 
         {/* Loading indicator when starting a query for threads */}
-        {isFetching && !isFetchingNextPage && (
-          <div className="flex justify-center mt-2">
-            <Loader2 className="w-6 h-6 text-emerald-500 animate-spin" />
-          </div>
-        )}
+        {isFetching && !isFetchingNextPage && <Loading />}
       </ul>
     </>
   );
