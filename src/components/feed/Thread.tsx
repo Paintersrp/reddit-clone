@@ -36,21 +36,23 @@ const Thread: FC<ThreadProps> = ({
     <div className="sm:rounded-md bg-white shadow sm:border-0 border-b border-zinc-200">
       <div className="px-3 py-2 sm:px-6 sm:py-4 flex justify-between">
         <div className="w-0 flex-1">
-          <div className="max-h-40 mt-1 text-xs text-gray-500">
-            {subhiveName ? (
-              <>
-                <a
-                  className="underline text-zinc-900 text-sm underline-offset-2"
-                  href={`/hive/${subhiveName}`}
-                >
-                  hive/{subhiveName}
-                </a>
-                <span className="px-1">•</span>
-              </>
-            ) : null}
-            <span>Posted by u/{thread.author.username}</span>
-            {"  "}
-            {formatTimeToNow(new Date(thread.createdAt))}
+          <div className="flex flex-row justify-between max-h-40 mt-1 text-xs text-gray-500">
+            <div>
+              {subhiveName ? (
+                <>
+                  <a
+                    className="underline text-zinc-900 text-sm underline-offset-2"
+                    href={`/hive/${subhiveName}`}
+                  >
+                    hive/{subhiveName}
+                  </a>
+                  <span className="px-1">•</span>
+                </>
+              ) : null}
+              <span>Posted by u/{thread.author.username}</span>
+              <span className="px-1">•</span>
+              <span>{formatTimeToNow(new Date(thread.createdAt))}</span>
+            </div>
           </div>
 
           <a href={`/hive/${subhiveName}/thread/${thread.id}`}>

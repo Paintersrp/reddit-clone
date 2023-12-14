@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/Select";
+import { Label } from "@/components/ui/Label";
 
 const Page = () => {
   const [subhive, setSubhive] = useState<string>("");
@@ -89,18 +90,21 @@ const Page = () => {
             </div>
 
             {subhives ? (
-              <Select onValueChange={setSubhive} value={subhive}>
-                <SelectTrigger className="w-[200px]">
-                  <SelectValue placeholder="Choose subhive" />
-                </SelectTrigger>
-                <SelectContent>
-                  {subhives.map((subhive) => (
-                    <SelectItem key={subhive.id} value={subhive.id}>
-                      {subhive.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex flex-col gap-2">
+                <Label>Select a Subhive</Label>
+                <Select onValueChange={setSubhive} value={subhive}>
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="Choose subhive" />
+                  </SelectTrigger>
+                  <SelectContent className="mt-2">
+                    {subhives.map((subhive) => (
+                      <SelectItem key={subhive.id} value={subhive.id}>
+                        {subhive.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             ) : (
               <div className="flex justify-center">
                 <Loader2 className="w-6 h-6 text-zinc-500 animate-spin" />

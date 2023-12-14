@@ -1,18 +1,20 @@
 "use client";
 
 import axios from "axios";
-import { FC, useEffect, useRef } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useIntersection } from "@mantine/hooks";
 import { Loader2 } from "lucide-react";
 
-import { ExtendedThreads } from "@/types/db";
+import { ExtendedThread } from "@/types/db";
 import { INFINITE_SCROLLING_PER_PAGE } from "@/config";
-import Thread from "../threads/Thread";
+import FeedItem from "./FeedItem";
+import ExtendedFeed from "./ExtendedFeed";
+import { FeedSortToolbar, type SortOptions } from "./FeedSortToolbar";
 
 interface ThreadFeedProps {
-  initialThreads: ExtendedThreads[];
+  initialThreads: ExtendedThread[];
   subhiveName?: string;
   all?: boolean;
 }
@@ -22,98 +24,128 @@ const ThreadFeed: FC<ThreadFeedProps> = ({
   subhiveName,
   all,
 }) => {
+  const { data: session } = useSession();
+
+  // Boolean state to flag the end of the original feed and need for an extended feed
+  const [showExtendedFeed, setShowExtendedFeed] = useState(false);
+
+  // String state to hold the sortation option selected, default to top
+  const [sortOption, setSortOption] = useState<SortOptions>("newest");
+
+  // Creating reference for our original feed
   const lastPostRef = useRef<HTMLElement>(null);
 
+  // Creating intersection observer for our ref, to be used to trigger the infinite scroll
   const { ref, entry } = useIntersection({
     root: lastPostRef.current,
     threshold: 1,
   });
 
-  const { data: session } = useSession();
+  // Fetches more threads from endpoint, determined by incoming all prop
+  const fetchThreads = async ({ pageParam = 1 }) => {
+    let base: string = "";
 
-  const { data, fetchNextPage, isFetchingNextPage } = useInfiniteQuery(
-    ["inf-query"],
-    async ({ pageParam = 1 }) => {
-      let base: string = "";
+    // Setup base endpoint to use
+    if (all) {
+      base = "/api/threads/all?";
+    } else {
+      base = "/api/threads?";
+    }
 
-      if (all) {
-        base = "/api/threads/all?";
-      } else {
-        base = "/api/threads?";
+    // Setup limit, page, subhive, and sort query search parameter
+    const limit = `limit=${INFINITE_SCROLLING_PER_PAGE}`;
+    const page = `&page=${pageParam}`;
+    const subhive = !!subhiveName ? `&subhiveName=${subhiveName}` : "";
+    const sort = `&sort=${sortOption}`;
+
+    // Combine and GET query
+    const query = `${base}${limit}${page}${subhive}${sort}`;
+    const { data } = await axios.get(query);
+
+    // If we have no more data to retrieve, and we aren't already processing all we initiate another feed
+    // If we are already using the all endpoint, then the user has exhausted all available threads in the db if there are no more.
+    if (!data.hasMore) {
+      if (!all) {
+        if (!subhiveName) {
+          setShowExtendedFeed(true);
+        }
       }
+    }
 
-      const limit = `limit=${INFINITE_SCROLLING_PER_PAGE}`;
-      const page = `&page=${pageParam}`;
-      const subhive = !!subhiveName ? `&subhiveName=${subhiveName}` : "";
+    return data.threads as ExtendedThread[];
+  };
 
-      const query = `${base}${limit}${page}${subhive}`;
-
-      const { data } = await axios.get(query);
-
-      return data as ExtendedThreads[];
-    },
-    {
+  const { data, fetchNextPage, isFetching, isFetchingNextPage } =
+    useInfiniteQuery(["inf-query", sortOption], fetchThreads, {
       getNextPageParam: (_, pages) => {
+        // If we can show the extended feed, then this feed has been exhausted.
+        // No need to paginate further
+        if (showExtendedFeed) {
+          return undefined;
+        }
+
         return pages.length + 1;
       },
       initialData: { pages: [initialThreads], pageParams: [1] },
-    }
-  );
+    });
 
+  // Effect to check the intersection observer to trigger fetching the next page
   useEffect(() => {
-    // Load more posts when the last post comes into view
     if (entry?.isIntersecting) {
       fetchNextPage();
     }
   }, [entry, fetchNextPage]);
 
+  // Flat maps and lengths of feed
   const threads = data?.pages.flatMap((page) => page) ?? initialThreads;
+  const length = threads.length;
 
   return (
-    <ul className="flex flex-col col-span-2 sm:space-y-6 sm:mt-0">
-      {threads.map((thread, index) => {
-        const votesAmt = thread.votes.reduce((acc, vote) => {
-          if (vote.type === "UP") return acc + 1;
-          if (vote.type === "DOWN") return acc - 1;
-          return acc;
-        }, 0);
+    <>
+      {/* Sort Toolbar */}
+      <FeedSortToolbar
+        currentOption={sortOption}
+        setSortOption={setSortOption}
+      />
 
-        const currentVote = thread.votes.find(
-          (vote) => vote.userId === session?.user.id
-        );
-
-        if (index === threads.length - 1) {
+      {/* Display of threads in our feed */}
+      <ul className="flex flex-col col-span-2 sm:space-y-6 sm:mt-0 mb-6">
+        {threads.map((thread, index) => {
           return (
-            <li key={thread.id} ref={ref}>
-              <Thread
-                commentAmt={thread.comments.length}
-                subhiveName={thread.subhive.name}
-                thread={thread}
-                currentVote={currentVote}
-                votesAmt={votesAmt}
-              />
-            </li>
-          );
-        } else {
-          return (
-            <Thread
+            <FeedItem
               key={thread.id}
-              commentAmt={thread.comments.length}
-              subhiveName={thread.subhive.name}
               thread={thread}
-              currentVote={currentVote}
-              votesAmt={votesAmt}
+              length={length}
+              index={index}
+              session={session}
+              ref={ref}
             />
           );
-        }
-      })}
+        })}
 
-      {isFetchingNextPage && (
-        <li className="flex justify-center">
-          <Loader2 className="w-6 h-6 text-zinc-500 animate-spin" />
-        </li>
+        {/* Loading indicator when fetching more threads */}
+        {isFetchingNextPage && (
+          <div className="flex justify-center mt-2">
+            <Loader2 className="w-6 h-6 text-zinc-500 animate-spin" />
+          </div>
+        )}
+
+        {/* Loading indicator when starting a query for threads */}
+        {isFetching && !isFetchingNextPage && (
+          <div className="flex justify-center mt-2">
+            <Loader2 className="w-6 h-6 text-zinc-500 animate-spin" />
+          </div>
+        )}
+      </ul>
+
+      {/* Once our original feed has been exhausted, we render an extended feed */}
+      {showExtendedFeed && (
+        <ExtendedFeed
+          originalFeedThreads={threads}
+          showExtendedFeed={showExtendedFeed}
+        />
       )}
-    </ul>
+    </>
   );
 };
 

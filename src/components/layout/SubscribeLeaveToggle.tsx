@@ -24,8 +24,10 @@ const SubscribeLeaveToggle: FC<SubscribeLeaveToggleProps> = ({
   const { loginToast } = useAuthToast();
   const router = useRouter();
 
+  // Mutation query for Subscribing
   const { mutate: subscribe, isLoading: isSubscribing } = useMutation({
     mutationFn: async () => {
+      // Set payload and post to subscribe endpoint
       const payload: SubscribeToSubhivePayload = {
         subhiveId,
       };
@@ -34,12 +36,14 @@ const SubscribeLeaveToggle: FC<SubscribeLeaveToggleProps> = ({
       return data as string;
     },
     onError: (err) => {
+      // Display toast with Login Button on 401 error
       if (err instanceof AxiosError) {
         if (err.response?.status === 401) {
           return loginToast();
         }
       }
 
+      // General toast for other errors
       return toast({
         title: "There was a problem.",
         description: "Something went wrong, please try again.",
@@ -47,19 +51,22 @@ const SubscribeLeaveToggle: FC<SubscribeLeaveToggleProps> = ({
       });
     },
     onSuccess: () => {
+      // Refresh router and send success toast
       startTransition(() => {
         router.refresh();
       });
 
-      toast({
+      return toast({
         title: "Subscribed!",
         description: `You are now subscribed to hive/${subhiveName}`,
       });
     },
   });
 
+  // Mutation query for Unsubscribing
   const { mutate: unsubscribe, isLoading: isUnsubscribing } = useMutation({
     mutationFn: async () => {
+      // Set payload and post to unsubscribe endpoint
       const payload: SubscribeToSubhivePayload = {
         subhiveId,
       };
@@ -67,13 +74,8 @@ const SubscribeLeaveToggle: FC<SubscribeLeaveToggleProps> = ({
       const { data } = await axios.post("/api/subhive/unsubscribe", payload);
       return data as string;
     },
-    onError: (err) => {
-      if (err instanceof AxiosError) {
-        if (err.response?.status === 401) {
-          return loginToast();
-        }
-      }
-
+    onError: () => {
+      // General toast for errors
       return toast({
         title: "There was a problem.",
         description: "Something went wrong, please try again.",
@@ -81,6 +83,7 @@ const SubscribeLeaveToggle: FC<SubscribeLeaveToggleProps> = ({
       });
     },
     onSuccess: () => {
+      // Refresh router and send success toast
       startTransition(() => {
         router.refresh();
       });

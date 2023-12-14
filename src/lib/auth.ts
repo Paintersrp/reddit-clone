@@ -27,6 +27,7 @@ export const authOptions: NextAuthOptions = {
         session.user.email = token.email;
         session.user.image = token.picture;
         session.user.username = token.username;
+        session.user.subs = token.subs;
       }
 
       return session;
@@ -35,6 +36,9 @@ export const authOptions: NextAuthOptions = {
       const dbUser = await db.user.findFirst({
         where: {
           email: token.email,
+        },
+        include: {
+          Subscription: true,
         },
       });
 
@@ -60,6 +64,7 @@ export const authOptions: NextAuthOptions = {
         email: dbUser.email,
         picture: dbUser.image,
         username: dbUser.username,
+        subs: dbUser.Subscription,
       };
     },
     redirect() {

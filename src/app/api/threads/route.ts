@@ -34,16 +34,18 @@ export async function GET(req: Request) {
     let whereClause = {};
 
     // Validate and parse url search parameters
-    const { limit, page, subhiveName } = z
+    const { limit, page, subhiveName, sort } = z
       .object({
         limit: z.string(),
         page: z.string(),
         subhiveName: z.string().nullish().optional(),
+        sort: z.string(),
       })
       .parse({
         limit: searchParams.get("limit"),
         page: searchParams.get("page"),
         subhiveName: searchParams.get("subhiveName"),
+        sort: searchParams.get("sort"),
       });
 
     if (subhiveName) {
@@ -67,13 +69,34 @@ export async function GET(req: Request) {
       }
     }
 
+    // Count the total threads available based on the whereClause
+    const totalThreadsCount = await db.thread.count({
+      where: whereClause,
+    });
+
+    // Setup order by based on sort parameter
+    const sortMap: { [key: string]: { [key: string]: string } } = {
+      newest: {
+        createdAt: "desc",
+      },
+      oldest: {
+        createdAt: "asc",
+      },
+      top: {
+        score: "desc",
+      },
+      worst: {
+        score: "asc",
+      },
+    };
+
+    const orderBy = sortMap[sort];
+
     // Use limit, page, and any where conditions to query the db for threads
     const threads = await db.thread.findMany({
       take: parseInt(limit),
       skip: (parseInt(page) - 1) * parseInt(limit),
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy,
       include: {
         subhive: true,
         votes: true,
@@ -83,8 +106,10 @@ export async function GET(req: Request) {
       where: whereClause,
     });
 
+    const hasMore = parseInt(page) * parseInt(limit) < totalThreadsCount;
+
     // Return threads
-    return new Response(JSON.stringify(threads));
+    return new Response(JSON.stringify({ threads, hasMore }));
   } catch (error) {
     // Handle validation error
     if (error instanceof z.ZodError) {

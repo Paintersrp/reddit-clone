@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 import { getAuthSession } from "@/lib/auth";
 import { INFINITE_SCROLLING_PER_PAGE } from "@/config";
 
-import CreateThread from "@/components/threads/CreateThread";
+import CreateThread from "@/components/layout/CreateThread";
 import ThreadFeed from "@/components/feed/ThreadFeed";
 
 interface PageProps {
@@ -41,7 +41,9 @@ const Page = async ({ params }: PageProps) => {
           subhive: true,
           _count: true,
         },
-        orderBy: { score: "desc" },
+        orderBy: { 
+          createdAt: "desc"
+         },
         take: INFINITE_SCROLLING_PER_PAGE,
       },
     },

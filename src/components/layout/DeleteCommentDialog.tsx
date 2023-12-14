@@ -1,14 +1,14 @@
 "use client";
 
 import { FC, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Trash } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 
-import { DeleteThreadRequest } from "@/lib/validators/delete-thread";
+import { DeleteCommentRequest } from "@/lib/validators/delete-comment";
 import { Button } from "../ui/Button";
 import { toast } from "@/hooks";
-import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -20,11 +20,11 @@ import {
   DialogClose,
 } from "../ui/Dialog";
 
-interface DeleteThreadProps {
-  threadId: string;
+interface DeleteCommentDialogProps {
+  commentId: string;
 }
 
-const DeleteThreadDialog: FC<DeleteThreadProps> = ({ threadId }) => {
+const DeleteCommentDialog: FC<DeleteCommentDialogProps> = ({ commentId }) => {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
@@ -32,12 +32,15 @@ const DeleteThreadDialog: FC<DeleteThreadProps> = ({ threadId }) => {
     setIsDeleting(!isDeleting);
   };
 
-  const deleteMutate = async ({ threadId }: DeleteThreadRequest) => {
-    const payload: DeleteThreadRequest = {
-      threadId,
+  const deleteMutate = async ({ commentId }: DeleteCommentRequest) => {
+    const payload: DeleteCommentRequest = {
+      commentId,
     };
 
-    const { data } = await axios.patch("/api/subhive/thread/delete", payload);
+    const { data } = await axios.patch(
+      "/api/subhive/thread/comment/delete",
+      payload
+    );
 
     return data;
   };
@@ -87,7 +90,7 @@ const DeleteThreadDialog: FC<DeleteThreadProps> = ({ threadId }) => {
               className="text-red-600 border border-red-600 hover:text-white transition-colors duration-200 ease-out font-semibold focus:ring-red-400 focus:outline-none focus:ring-2 focus:border-none"
               variant="destructive"
               isLoading={deleteLoading}
-              onClick={() => deleteComment({ threadId })}
+              onClick={() => deleteComment({ commentId })}
               type="button"
               autoFocus
             >
@@ -100,4 +103,4 @@ const DeleteThreadDialog: FC<DeleteThreadProps> = ({ threadId }) => {
   );
 };
 
-export default DeleteThreadDialog;
+export default DeleteCommentDialog;

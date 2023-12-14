@@ -1,9 +1,11 @@
 "use client";
 
+import type { ExtendedComment } from "@/types/db";
+
 import { FC, useRef, useState } from "react";
 import { CommentVote } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
-import { MessageSquare, Trash } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import axios, { AxiosError } from "axios";
@@ -16,9 +18,7 @@ import { Button } from "../ui/Button";
 import { Label } from "../ui/Label";
 import UserAvatar from "../ui/UserAvatar";
 import CommentVotes from "./CommentVotes";
-
-import type { ExtendedComment } from "@/types/db";
-import { DeleteCommentRequest } from "@/lib/validators/delete";
+import DeleteCommentDialog from "../layout/DeleteCommentDialog";
 
 interface CommentProps {
   comment: ExtendedComment;
@@ -44,7 +44,6 @@ const Comment: FC<CommentProps> = ({
 
   const [input, setInput] = useState<string>("");
   const [isReplying, setIsReplying] = useState<boolean>(false);
-  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   const replyClick = () => {
     if (!session) return router.push("/sign-in");
@@ -87,50 +86,6 @@ const Comment: FC<CommentProps> = ({
     mutationFn: replyMutate,
     onError: replyError,
     onSuccess: replySuccess,
-  });
-
-  // TODO Implement Modal
-  // TODO Implement User to Anomymous on Delete as well
-  const deleteClick = () => {
-    setIsDeleting(!isDeleting);
-  };
-
-  const deleteMutate = async ({ commentId }: DeleteCommentRequest) => {
-    const payload: DeleteCommentRequest = {
-      commentId,
-    };
-
-    const { data } = await axios.patch(
-      "/api/subhive/thread/comment/delete",
-      payload
-    );
-
-    return data;
-  };
-
-  const deleteError = (err: unknown) => {
-    if (err instanceof AxiosError) {
-      if (err.response?.status === 401) {
-        return loginToast();
-      }
-    }
-
-    return toast({
-      title: "There was a problem.",
-      description: "Something went wrong, please try again.",
-      variant: "destructive",
-    });
-  };
-
-  const deleteSuccess = () => {
-    router.refresh();
-    setIsDeleting(false);
-  };
-
-  const { mutate: deleteComment, isLoading: deleteLoading } = useMutation({
-    mutationFn: deleteMutate,
-    onError: deleteError,
-    onSuccess: deleteSuccess,
   });
 
   return (
@@ -180,18 +135,9 @@ const Comment: FC<CommentProps> = ({
             </Button>
           </div>
 
-          {/* TODO Confirm Delete Modal */}
-          {/* TODO Also check if comment already has been deleted */}
+          {/* TODO Check if comment already has been deleted */}
           {session?.user.id === comment.authorId && (
-            <Button
-              onClick={() => deleteComment({ commentId: comment.id })}
-              className="bg-red-500 hover:bg-red-600"
-              size="xxs"
-              isLoading={deleteLoading}
-            >
-              {/* TODO Icon? */}
-              <Trash className="h-4 w-4" />
-            </Button>
+            <DeleteCommentDialog commentId={comment.id} />
           )}
         </div>
 

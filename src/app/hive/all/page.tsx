@@ -7,14 +7,16 @@ import { db } from "@/lib/db";
 import { buttonVariants } from "@/components/ui/Button";
 import { Icons } from "@/components/ui/Icons";
 import ThreadFeed from "@/components/feed/ThreadFeed";
-import CreateThread from "@/components/threads/CreateThread";
+import CreateThread from "@/components/layout/CreateThread";
 
 const Page = async () => {
   const session = await getAuthSession();
 
   const threads = await db.thread.findMany({
     take: INFINITE_SCROLLING_PER_PAGE,
-    orderBy: { createdAt: "desc" },
+    orderBy: {
+      createdAt: "desc",
+    },
     include: {
       subhive: true,
       votes: true,

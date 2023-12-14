@@ -1,8 +1,9 @@
 "use client";
 
 import { FC } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Menu } from "lucide-react";
+import Link from "next/link";
 
 import {
   DropdownMenu,
@@ -12,8 +13,6 @@ import {
   DropdownMenuSeparator,
 } from "../ui/DropdownMenu";
 import { Avatar, AvatarFallback } from "../ui/Avatar";
-import { Icons } from "../ui/Icons";
-import { Menu } from "lucide-react";
 
 const GuestMenu: FC = () => {
   const router = useRouter();
@@ -42,11 +41,17 @@ const GuestMenu: FC = () => {
         <DropdownMenuSeparator />
 
         <DropdownMenuItem className="text-sm" asChild>
+          <Link href="/browse">Browse Subhives</Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem className="text-sm" asChild>
           <Link href="/">Home</Link>
         </DropdownMenuItem>
 
         <DropdownMenuItem className="text-sm" asChild>
-          <Link href="/all">All</Link>
+          <Link href="/hive/all">All</Link>
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />

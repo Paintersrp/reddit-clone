@@ -47,6 +47,8 @@ const UserFeed = async ({ session }: UserFeedProps) => {
     take: INFINITE_SCROLLING_PER_PAGE,
   });
 
+  // Do I need to pass the where clause too?
+
   return <ThreadFeed initialThreads={threads} />;
 };
 

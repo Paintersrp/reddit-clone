@@ -4,6 +4,32 @@ import { SubhiveSubscriptionValidator } from "@/lib/validators/subscribe";
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 
+export async function GET(req: Request) {
+  // Get request body json and then parse it with validator
+  // const body = await req.json();
+  // const { subhiveId } = SubhiveSubscriptionValidator.parse(body);
+
+  // Retrieve session, if exists
+  const session = await getAuthSession();
+
+  // If no user, give an unauthorized response
+  if (!session?.user) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
+  // Query database for the user's current subscription status
+  const user = await db.user.findFirst({
+    where: {
+      id: session.user.id,
+    },
+    include: {
+      Subscription: true,
+    },
+  });
+
+  return new Response(JSON.stringify({ subs: user?.Subscription }));
+}
+
 export async function POST(req: Request) {
   try {
     // Get request body json and then parse it with validator

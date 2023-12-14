@@ -6,18 +6,16 @@ export async function GET(req: Request) {
 
   try {
     // Parse query parameters
-    const { limit, page, sortType, sortOrder } = z
+    const { limit, page, sort } = z
       .object({
         limit: z.string(),
         page: z.string(),
-        sortType: z.enum(["top", "date"]).optional(),
-        sortOrder: z.enum(["asc", "desc"]).optional(),
+        sort: z.string(),
       })
       .parse({
         limit: searchParams.get("limit") ?? 10,
         page: searchParams.get("page") ?? 1,
-        sortType: searchParams.get("sortType") ?? "top",
-        sortOrder: searchParams.get("sortOrder") ?? "desc",
+        sort: searchParams.get("sort"),
       });
 
     // Number of threads to return
@@ -26,16 +24,25 @@ export async function GET(req: Request) {
     // Number of threads to skip before beginning to take
     const skip = (parseInt(page) - 1) * take;
 
-    // Direction to sort the createdAt by
-    let orderBy = {};
+    // Setup order by based on sort parameter
+    const sortMap: { [key: string]: { [key: string]: string } } = {
+      newest: {
+        createdAt: "desc",
+      },
+      oldest: {
+        createdAt: "asc",
+      },
+      top: {
+        score: "desc",
+      },
+      worst: {
+        score: "asc",
+      },
+    };
 
-    if (sortType === "date") {
-      orderBy = { createdAt: sortOrder };
-    } else if (sortType === "top") {
-      orderBy = {
-        score: sortOrder,
-      };
-    }
+    const orderBy = sortMap[sort];
+
+    const totalThreadsCount = await db.thread.count();
 
     // Find threads based on query parameters
     const threads = await db.thread.findMany({
@@ -51,7 +58,9 @@ export async function GET(req: Request) {
       },
     });
 
-    return new Response(JSON.stringify(threads));
+    const hasMore = parseInt(page) * parseInt(limit) < totalThreadsCount;
+
+    return new Response(JSON.stringify({ threads, hasMore }));
   } catch (error) {
     // Handle validation error
     if (error instanceof z.ZodError) {

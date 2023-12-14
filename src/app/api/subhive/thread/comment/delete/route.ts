@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { DeleteCommentValidator } from "@/lib/validators/delete";
+import { DeleteCommentValidator } from "@/lib/validators/delete-comment";
 
 export async function PATCH(req: Request) {
   try {

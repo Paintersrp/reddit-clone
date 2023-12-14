@@ -1,12 +1,14 @@
 "use client";
 
+import type { Session } from "next-auth";
+
 import { FC, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Session } from "next-auth";
-import UserAvatar from "../ui/UserAvatar";
+import { ImageIcon, Link2 } from "lucide-react";
+
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
-import { ImageIcon, Link2 } from "lucide-react";
+import UserAvatar from "../ui/UserAvatar";
 
 interface CreateThreadProps {
   session: Session | null;

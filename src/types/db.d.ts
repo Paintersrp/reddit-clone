@@ -7,7 +7,7 @@ import {
   Vote,
 } from "@prisma/client";
 
-export type ExtendedThreads = Thread & {
+export type ExtendedThread = Thread & {
   subhive: Subhive;
   votes: Vote[];
   author: User;

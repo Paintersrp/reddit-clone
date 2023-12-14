@@ -1,11 +1,11 @@
 import { HomeIcon } from "lucide-react";
 import Link from "next/link";
 
-import GeneralFeed from "@/components/feed/GeneralFeed";
+import AllFeed from "@/components/feed/AllFeed";
 import UserFeed from "@/components/feed/UserFeed";
+import CreateThread from "@/components/layout/CreateThread";
 import { buttonVariants } from "@/components/ui/Button";
 import { getAuthSession } from "@/lib/auth";
-import CreateThread from "@/components/threads/CreateThread";
 
 export default async function Home() {
   const session = await getAuthSession();
@@ -19,10 +19,10 @@ export default async function Home() {
         {/* Subreddit Info */}
         <div className="sm:block overflow-hidden h-fit sm:rounded-lg border border-gray-200 order-first md:order-last">
           <div className="bg-emerald-100 px-3 py-1 md:px-4 md:py-2">
-            <p className="font-semibold py-3 flex items-center gap-1.5">
+            <div className="font-semibold py-3 flex items-center gap-1.5">
               <HomeIcon className="w-7 h-7 mr-2" />
               <h1 className="text-2xl">Home</h1>
-            </p>
+            </div>
           </div>
 
           <div className="-my-3 px-4 py-4 md:px-4 md:py-4 text-sm leading-6">
@@ -56,8 +56,9 @@ export default async function Home() {
         <div className="col-span-2">
           {/* Feed Display */}
           <CreateThread session={session} />
+
           {/* @ts-expect-error Server Component */}
-          {session ? <UserFeed session={session} /> : <GeneralFeed />}
+          {session ? <UserFeed session={session} /> : <AllFeed />}
         </div>
       </div>
     </>

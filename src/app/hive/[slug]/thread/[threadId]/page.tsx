@@ -5,7 +5,7 @@ import { Loader2, MessageSquare } from "lucide-react";
 import { db } from "@/lib/db";
 import { getAuthSession } from "@/lib/auth";
 import { redis } from "@/lib/redis";
-import { ExtendedThreads } from "@/types/db";
+import { ExtendedThread } from "@/types/db";
 import { CachedThread } from "@/types/redis";
 import { formatTimeToNow } from "@/lib/utils";
 
@@ -13,7 +13,7 @@ import VoteServerWrapper from "@/components/vote/server/VoteServerWrapper";
 import VoteSkeleton from "@/components/vote/VoteSkeleton";
 import EditorOutput from "@/components/editor/EditorOutput";
 import Comments from "@/components/comments/Comments";
-import DeleteThreadDialog from "@/components/threads/DeleteThreadDialog";
+import DeleteThreadDialog from "@/components/layout/DeleteThreadDialog";
 
 interface PageProps {
   params: {
@@ -32,7 +32,7 @@ const Page = async ({ params }: PageProps) => {
     `thread:${threadId}`
   )) as CachedThread;
 
-  let thread: Partial<ExtendedThreads> | null = null;
+  let thread: Partial<ExtendedThread> | null = null;
 
   if (!cachedThread) {
     thread = await db.thread.findFirst({
