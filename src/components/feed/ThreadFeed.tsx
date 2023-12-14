@@ -77,7 +77,7 @@ const ThreadFeed: FC<ThreadFeedProps> = ({
   };
 
   const { data, fetchNextPage, isFetching, isFetchingNextPage } =
-    useInfiniteQuery(["inf-query", sortOption], fetchThreads, {
+    useInfiniteQuery(["inf-query", sortOption, subhiveName, all], fetchThreads, {
       getNextPageParam: (_, pages) => {
         // If we can show the extended feed, then this feed has been exhausted.
         // No need to paginate further
