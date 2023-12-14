@@ -25,14 +25,19 @@ interface DeleteThreadDialogProps {
 }
 
 const DeleteThreadDialog: FC<DeleteThreadDialogProps> = ({ threadId }) => {
+  // Setup router for success navigation
   const router = useRouter();
+
+  // Boolean state for determining whether to display the dialog element
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
+  // Toggles boolean state for dialog visibility
   const deleteClick = () => {
     setIsDeleting(!isDeleting);
   };
 
   const deleteMutate = async ({ threadId }: DeleteThreadRequest) => {
+    // Sets up thread deletion payload and sends it to the deletion endpoint
     const payload: DeleteThreadRequest = {
       threadId,
     };
@@ -42,6 +47,7 @@ const DeleteThreadDialog: FC<DeleteThreadDialogProps> = ({ threadId }) => {
     return data;
   };
 
+  // Handles errors with a generic error toast
   const deleteError = () => {
     return toast({
       title: "There was a problem.",
@@ -50,6 +56,7 @@ const DeleteThreadDialog: FC<DeleteThreadDialogProps> = ({ threadId }) => {
     });
   };
 
+  // On successful delete, we refresh the router and reset state
   const deleteSuccess = () => {
     router.refresh();
     setIsDeleting(false);

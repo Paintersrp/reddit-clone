@@ -1,7 +1,8 @@
 "use client";
 
+import type { Subhive } from "@prisma/client";
+
 import { FC, useMemo, useState } from "react";
-import { Subhive } from "@prisma/client";
 
 import { buttonVariants } from "@/components/ui/Button";
 
@@ -10,6 +11,7 @@ interface AlphabetNavigationProps {
 }
 
 const AlphabetNavigation: FC<AlphabetNavigationProps> = ({ subhives }) => {
+  // String state to handle active navigation choice
   const [activeLetter, setActiveLetter] = useState("A");
 
   // Build letters that need to be used for navigation purposes, based on subhive names

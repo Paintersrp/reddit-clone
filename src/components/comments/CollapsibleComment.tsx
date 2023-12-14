@@ -1,12 +1,15 @@
 "use client";
 
-import { FC, useState } from "react";
-import { type Comment as CommentType, CommentVote, User } from "@prisma/client";
-import { Session } from "next-auth";
-import { motion, AnimatePresence } from "framer-motion";
+import type { CommentVote } from "@prisma/client";
+import type { Session } from "next-auth";
+import type { ExtendedCommentWithReplies } from "@/types/db";
 
+import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
+import { FC, useState } from "react";
+
+import { Button } from "@/components/ui/Button";
 import { formatTimeToNow } from "@/lib/utils";
-import { Button } from "../ui/Button";
 import Comment from "./Comment";
 import CommentWithReplies from "./CommentWithReplies";
 
@@ -14,16 +17,7 @@ interface CollapsibleCommentProps {
   threadId: string;
   votesAmt: number;
   currentVote: CommentVote | undefined;
-  comment: CommentType & {
-    votes: CommentVote[];
-    replies: (CommentType & {
-      votes: CommentVote[];
-      author: User;
-      replyTo: CommentType | null;
-      replies: any;
-    })[];
-    author: User;
-  };
+  comment: ExtendedCommentWithReplies;
   session: Session | null;
 }
 
@@ -34,14 +28,17 @@ const CollapsibleComment: FC<CollapsibleCommentProps> = ({
   comment,
   session,
 }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  // Boolean state for maintaining collapsed status
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
 
+  // Handle function for collapse state
   const handleCollapse = () => {
     setIsCollapsed(!isCollapsed);
   };
 
   return (
     <>
+      {/* Renders comment with recursive rendering of nested comments and replies */}
       <AnimatePresence>
         {!isCollapsed && (
           <motion.div
@@ -50,7 +47,7 @@ const CollapsibleComment: FC<CollapsibleCommentProps> = ({
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
           >
-            {/* Render the comment */}
+            {/* Comment display */}
             <div className="mb-2">
               <Comment
                 threadId={threadId}
@@ -62,7 +59,7 @@ const CollapsibleComment: FC<CollapsibleCommentProps> = ({
               />
             </div>
 
-            {/* Render replies */}
+            {/* Comment replies */}
             {comment.replies?.map((reply) => (
               <div
                 key={reply.id}
@@ -79,8 +76,8 @@ const CollapsibleComment: FC<CollapsibleCommentProps> = ({
         )}
       </AnimatePresence>
 
+      {/* Collapsed comment display */}
       <AnimatePresence>
-        {/* Collapsed Comment Display */}
         {isCollapsed && (
           <motion.div
             initial={{ y: -30, opacity: 0 }}
@@ -92,7 +89,12 @@ const CollapsibleComment: FC<CollapsibleCommentProps> = ({
               <div className="flex w-full justify-between">
                 <div className="ml-2 flex items-center gap-x-2">
                   <p className="text-sm font-medium text-gray-900">
-                    u/{comment.author.username}
+                    <Link
+                      href={`/user/${comment.author.username}`}
+                      className="text-blue-700 hover:underline"
+                    >
+                      u/{comment.author.username}
+                    </Link>
                   </p>
 
                   <p className="max-h-40 truncate text-xs text-zinc-500">

@@ -11,6 +11,7 @@ const Comments = async ({ threadId }: CommentsProps) => {
   // Get session, if available
   const session = await getAuthSession();
 
+  // TODO - Adapt to retrieve all comments, then process their nested structure after to handle deeply nested comments and replies
   // Top level comments, with top level replies
   const comments = await db.comment.findMany({
     where: {
@@ -61,7 +62,7 @@ const Comments = async ({ threadId }: CommentsProps) => {
       {/* Comment Creation */}
       <CreateComment threadId={threadId} />
 
-      {/* Comments Section */}
+      {/* Comments Display */}
       <div className="flex flex-col gap-y-6 mt-4">
         {comments
           .filter((comment) => !comment.replyToId)

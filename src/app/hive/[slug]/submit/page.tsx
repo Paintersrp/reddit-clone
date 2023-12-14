@@ -37,7 +37,12 @@ const Page = async ({ params }: PageProps) => {
       <Editor subhiveId={subhive.id} />
 
       <div className="w-full flex justify-end">
-        <Button type="submit" className="w-full" form="subhive-post-form">
+        <Button
+          isLoading
+          type="submit"
+          className="w-full"
+          form="subhive-post-form"
+        >
           Post
         </Button>
       </div>

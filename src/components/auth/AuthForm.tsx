@@ -1,20 +1,24 @@
 "use client";
 
-import { FC, useState } from "react";
 import { signIn } from "next-auth/react";
+import { FC, useState } from "react";
 
-import { Button } from "../ui/Button";
-import { Icons } from "../ui/Icons";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/Button";
+import { Icons } from "@/components/ui/Icons";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 const AuthForm: FC<React.HTMLAttributes<HTMLDivElement>> = ({
   className,
   ...rest
 }) => {
-  const [isLoading, setIsLoading] = useState(false);
+  // Boolean state for manually determining loading state
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  // Hook returns function for rendering toast elements
   const { toast } = useToast();
 
+  // Functions to allow user to log in using Google Provider
   const loginWithGoogle = async () => {
     setIsLoading(true);
 
@@ -27,9 +31,7 @@ const AuthForm: FC<React.HTMLAttributes<HTMLDivElement>> = ({
         variant: "destructive",
       });
     } finally {
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 2000);
+      setIsLoading(false);
     }
   };
 

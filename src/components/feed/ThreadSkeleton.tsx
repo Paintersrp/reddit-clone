@@ -1,5 +1,6 @@
 import { FC } from "react";
 
+// Unused, WIP
 const ThreadSkeleton: FC = () => {
   return (
     <div className="animate-pulse sm:rounded-md bg-white shadow sm:border-0 border-b border-zinc-200 p-1.5">

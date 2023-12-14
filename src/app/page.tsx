@@ -32,6 +32,7 @@ export default async function Home() {
                 communities
               </p>
             </div>
+
             <Link
               href="/hive/create"
               className={buttonVariants({

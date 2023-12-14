@@ -35,10 +35,24 @@ export async function GET(req: Request) {
     take: 10,
   });
 
+  // Search for users containing the query
+  const userResults = await db.user.findMany({
+    where: {
+      username: {
+        contains: query,
+      },
+    },
+    include: {
+      _count: true,
+    },
+    take: 10,
+  });
+
   // Combined search results
   const results = {
     threads: threadResults,
     hives: hiveResults,
+    users: userResults,
   };
 
   // Return response of search results

@@ -2,28 +2,35 @@
 
 import type { Session } from "next-auth";
 
-import { FC, useEffect, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
 import { ImageIcon, Link2 } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { FC, useEffect, useState } from "react";
 
-import { Input } from "../ui/Input";
-import { Button } from "../ui/Button";
-import UserAvatar from "../ui/UserAvatar";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import UserAvatar from "./UserAvatar";
 
 interface CreateThreadProps {
   session: Session | null;
 }
 
 const CreateThread: FC<CreateThreadProps> = ({ session }) => {
+  // Setup router for navigation
   const router = useRouter();
+
+  // Retrieve current pathname
   const pathname = usePathname();
 
-  const [path, setPath] = useState(pathname);
+  // String state to maintain adjusted path target
+  const [path, setPath] = useState<string>(pathname);
 
+  // If we are coming from a path with no subhive, we go to a generic creation page instead
   useEffect(() => {
+    // Generic thread creation path
     if (pathname === "/" || pathname === "/hive/all") {
       setPath("");
     } else {
+      // Use nested hive creation path
       setPath(pathname);
     }
   }, [pathname]);

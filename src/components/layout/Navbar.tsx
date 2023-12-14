@@ -1,14 +1,14 @@
 import Link from "next/link";
 import React from "react";
 
-import { Icons } from "./Icons";
-import { buttonVariants } from "./Button";
+import { Icons } from "@/components/ui/Icons";
 import { getAuthSession } from "@/lib/auth";
-import UserMenu from "../layout/UserMenu";
+import UserMenu from "./UserMenu";
 import SearchBar from "./SearchBar";
-import GuestMenu from "../layout/GuestMenu";
+import GuestMenu from "./GuestMenu";
 
-export const Navbar = async ({}) => {
+export const Navbar = async () => {
+  // Retrieve current user session, if exits
   const session = await getAuthSession();
 
   return (
@@ -28,7 +28,8 @@ export const Navbar = async ({}) => {
         {/* Search */}
         <SearchBar />
 
-        {session?.user ? <UserMenu user={session.user} /> : <GuestMenu />}
+        {/* Application Menu */}
+        {session?.user ? <UserMenu session={session} /> : <GuestMenu />}
       </div>
     </div>
   );

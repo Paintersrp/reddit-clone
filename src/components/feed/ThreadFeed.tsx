@@ -1,16 +1,16 @@
 "use client";
 
 import axios from "axios";
-import { FC, useEffect, useRef, useState } from "react";
+import { Loader2 } from "lucide-react";
+import { useIntersection } from "@mantine/hooks";
 import { useSession } from "next-auth/react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useIntersection } from "@mantine/hooks";
-import { Loader2 } from "lucide-react";
+import { FC, useEffect, useRef, useState } from "react";
 
-import { ExtendedThread } from "@/types/db";
 import { INFINITE_SCROLLING_PER_PAGE } from "@/config";
-import FeedItem from "./FeedItem";
+import { ExtendedThread } from "@/types/db";
 import ExtendedFeed from "./ExtendedFeed";
+import FeedItem from "./FeedItem";
 import { FeedSortToolbar, type SortOptions } from "./FeedSortToolbar";
 
 interface ThreadFeedProps {
@@ -24,12 +24,13 @@ const ThreadFeed: FC<ThreadFeedProps> = ({
   subhiveName,
   all,
 }) => {
+  // Retrieve current user session, if exists
   const { data: session } = useSession();
 
   // Boolean state to flag the end of the original feed and need for an extended feed
   const [showExtendedFeed, setShowExtendedFeed] = useState(false);
 
-  // String state to hold the sortation option selected, default to top
+  // String state to hold the sortation option selected, default to newest
   const [sortOption, setSortOption] = useState<SortOptions>("newest");
 
   // Creating reference for our original feed
@@ -117,7 +118,7 @@ const ThreadFeed: FC<ThreadFeedProps> = ({
               thread={thread}
               length={length}
               index={index}
-              session={session}
+              userId={session?.user.id}
               ref={ref}
             />
           );
@@ -126,14 +127,14 @@ const ThreadFeed: FC<ThreadFeedProps> = ({
         {/* Loading indicator when fetching more threads */}
         {isFetchingNextPage && (
           <div className="flex justify-center mt-2">
-            <Loader2 className="w-6 h-6 text-zinc-500 animate-spin" />
+            <Loader2 className="w-6 h-6 text-emerald-500 animate-spin" />
           </div>
         )}
 
         {/* Loading indicator when starting a query for threads */}
         {isFetching && !isFetchingNextPage && (
           <div className="flex justify-center mt-2">
-            <Loader2 className="w-6 h-6 text-zinc-500 animate-spin" />
+            <Loader2 className="w-6 h-6 text-emerald-500 animate-spin" />
           </div>
         )}
       </ul>

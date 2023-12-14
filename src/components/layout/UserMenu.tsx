@@ -4,7 +4,7 @@ import { FC } from "react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 
-import type { User } from "next-auth";
+import type { Session } from "next-auth";
 
 import {
   DropdownMenu,
@@ -13,42 +13,47 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "../ui/DropdownMenu";
-import UserAvatar from "../ui/UserAvatar";
+import UserAvatar from "./UserAvatar";
 
 interface UserMenuProps {
-  user: Pick<User, "name" | "image" | "email">;
+  session: Session;
 }
 
-const UserMenu: FC<UserMenuProps> = ({ user }) => {
+const UserMenu: FC<UserMenuProps> = ({ session }) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
         <UserAvatar
           className="h-8 w-8 mr-2 sm:mr-0 ml-1 sm:ml-0"
-          user={{ name: user.name || null, image: user.image || null }}
+          user={{
+            name: session.user.name || null,
+            image: session.user.image || null,
+          }}
         />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="bg-white" align="end">
-        <div className="flex items-center justify-start gap-2 p-2">
-          <div className="flex flex-col space-y-1 leading-none">
-            {user.name && <p className="font-semibold text-sm">{user.name}</p>}
-            {user.email && (
-              <p className="w-[200px] truncate text-sm text-zinc-700">
-                {user.email}
-              </p>
-            )}
-          </div>
-        </div>
+        <DropdownMenuItem className="text-sm" asChild>
+          <Link href={`/user/${session.user.username}`}>
+            <div className="flex items-center justify-start gap-2">
+              <div className="flex flex-col space-y-1 leading-none">
+                {session.user.name && (
+                  <p className="font-semibold text-sm">{session.user.name}</p>
+                )}
+                {session.user.email && (
+                  <p className="w-[200px] truncate text-sm text-zinc-700">
+                    {session.user.email}
+                  </p>
+                )}
+              </div>
+            </div>
+          </Link>
+        </DropdownMenuItem>
 
         <DropdownMenuSeparator />
 
         <DropdownMenuItem className="text-sm" asChild>
           <Link href="/browse">Browse Subhives</Link>
-        </DropdownMenuItem>
-
-        <DropdownMenuItem className="text-sm" disabled asChild>
-          <Link href="/browse">Your Subhives</Link>
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />

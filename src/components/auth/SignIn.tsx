@@ -1,10 +1,11 @@
-import { FC } from "react";
-import { Icons } from "../ui/Icons";
 import Link from "next/link";
+import { FC } from "react";
+
+import { Icons } from "@/components/ui/Icons";
 import AuthForm from "./AuthForm";
 
 // Sign In / Sign Up left as separate components for future proofing
-const SignIn: FC = ({}) => {
+const SignIn: FC = () => {
   return (
     <div className="container mx-auto flex w-full flex-col justify-center space-y-6">
       <div className="flex flex-col space-y-2 text-center">

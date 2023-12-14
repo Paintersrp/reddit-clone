@@ -1,15 +1,15 @@
 "use client";
 
+import axios, { AxiosError } from "axios";
+import { useRouter } from "next/navigation";
 import { FC, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import axios, { AxiosError } from "axios";
 
-import { CommentRequest } from "@/lib/validators/comment";
+import { Button } from "@/components/ui/Button";
+import { Label } from "@/components/ui/Label";
+import { Textarea } from "@/components/ui/Textarea";
 import { toast, useAuthToast } from "@/hooks";
-import { Label } from "../ui/Label";
-import { Textarea } from "../ui/Textarea";
-import { Button } from "../ui/Button";
+import { CommentRequest } from "@/lib/validators/comment";
 
 interface CreateCommentProps {
   threadId: string;
@@ -17,12 +17,17 @@ interface CreateCommentProps {
 }
 
 const CreateComment: FC<CreateCommentProps> = ({ threadId, replyToId }) => {
+  // Setup router for success navigation
   const router = useRouter();
 
+  // String state for the comment text
   const [input, setInput] = useState<string>("");
+
+  // Hook returns function for rendering a toast with a login prompt
   const { loginToast } = useAuthToast();
 
   const mutationFn = async ({ threadId, text, replyToId }: CommentRequest) => {
+    // Sets up payload for creating a comment and sends it to the creation endpoint
     const payload: CommentRequest = {
       threadId,
       text,
@@ -35,12 +40,14 @@ const CreateComment: FC<CreateCommentProps> = ({ threadId, replyToId }) => {
   };
 
   const onError = (err: unknown) => {
+    // If error is 401 Unauthorized, send a toast with a login prompt
     if (err instanceof AxiosError) {
       if (err.response?.status === 401) {
         return loginToast();
       }
     }
 
+    // Render toast for general error
     return toast({
       title: "There was a problem.",
       description: "Something went wrong, please try again.",
@@ -49,6 +56,7 @@ const CreateComment: FC<CreateCommentProps> = ({ threadId, replyToId }) => {
   };
 
   const onSuccess = () => {
+    // Refresh and reset input
     router.refresh();
     setInput("");
   };

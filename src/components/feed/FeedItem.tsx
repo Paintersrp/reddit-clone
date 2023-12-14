@@ -1,7 +1,6 @@
 "use client";
 
 import type { ExtendedThread } from "@/types/db";
-import type { Session } from "next-auth";
 
 import { forwardRef } from "react";
 
@@ -11,15 +10,13 @@ interface FeedItemProps {
   thread: ExtendedThread;
   length: number;
   index: number;
-  session: Session | null;
+  userId: string | undefined;
 }
 
 const FeedItem = forwardRef<HTMLLIElement, FeedItemProps>(
-  ({ thread, length, index, session }, ref) => {
+  ({ thread, length, index, userId }, ref) => {
     // Gets the current user's vote, if exists
-    const userVote = thread.votes.find(
-      (vote) => vote.userId === session?.user.id
-    );
+    const userVote = thread.votes.find((vote) => vote.userId === userId);
 
     // If the index is the last, we add a ref to the thread display for triggering intersection observer
     if (index === length - 1) {

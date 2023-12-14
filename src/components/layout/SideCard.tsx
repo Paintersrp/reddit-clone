@@ -48,10 +48,15 @@ const SideCardHeader: FC<SideCardHeaderProps> = ({
   innerClass,
 }) => {
   return (
-    <div className={cn("bg-emerald-100 px-3 py-1 md:px-4 md:py-2", className)}>
+    <div
+      className={cn(
+        "bg-emerald-100 px-2 sm:px-3 sm:py-1 md:px-4 md:py-2",
+        className
+      )}
+    >
       <div
         className={cn(
-          "font-semibold py-3 flex items-center gap-1.5",
+          "font-semibold py-2 sm:py-3 flex items-center gap-1.5",
           innerClass
         )}
       >

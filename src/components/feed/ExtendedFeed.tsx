@@ -2,15 +2,16 @@
 
 import type { ExtendedThread } from "@/types/db";
 
-import { FC, useEffect, useRef, useState } from "react";
+import axios from "axios";
+import { Loader2 } from "lucide-react";
+import { useIntersection } from "@mantine/hooks";
 import { useSession } from "next-auth/react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useIntersection } from "@mantine/hooks";
-import { Loader2 } from "lucide-react";
-import axios from "axios";
+import { FC, useEffect, useRef, useState } from "react";
 
 import { INFINITE_SCROLLING_PER_PAGE } from "@/config";
 import FeedItem from "./FeedItem";
+import { FeedSortToolbar, SortOptions } from "./FeedSortToolbar";
 
 interface ExtendedFeedProps {
   originalFeedThreads: ExtendedThread[];
@@ -29,6 +30,9 @@ const ExtendedFeed: FC<ExtendedFeedProps> = ({
   // Creating ref for the last post of our feed
   const lastPostRef = useRef<HTMLElement>(null);
 
+  // String state to hold the sortation option selected, default to newest
+  const [sortOption, setSortOption] = useState<SortOptions>("newest");
+
   // Creating intersection observers for our ref, to be used to trigger the infinite scroll
   const { ref, entry } = useIntersection({
     root: lastPostRef.current,
@@ -40,9 +44,10 @@ const ExtendedFeed: FC<ExtendedFeedProps> = ({
     const base = "/api/threads/all?";
     const limit = `limit=${INFINITE_SCROLLING_PER_PAGE}`;
     const page = `&page=${pageParam}`;
+    const sort = `&sort=${sortOption}`;
 
     // Build query from base endpoint with limit number and page number search parameters.
-    const query = `${base}${limit}${page}`;
+    const query = `${base}${limit}${page}${sort}`;
     const { data } = await axios.get(query);
 
     // If we have no more data, we set fetchedAll to true.
@@ -53,10 +58,8 @@ const ExtendedFeed: FC<ExtendedFeedProps> = ({
     return data.threads as ExtendedThread[];
   };
 
-  const { data, fetchNextPage, isFetchingNextPage } = useInfiniteQuery(
-    ["inf-query-more"],
-    fetchAllThreads,
-    {
+  const { data, fetchNextPage, isFetching, isFetchingNextPage } =
+    useInfiniteQuery(["inf-query-more", sortOption], fetchAllThreads, {
       getNextPageParam: (_, pages) => {
         // If we have already fetchedAll the available threads, we do not paginate further
         if (fetchedAll) {
@@ -67,8 +70,7 @@ const ExtendedFeed: FC<ExtendedFeedProps> = ({
       },
       initialData: { pages: [], pageParams: [1] },
       enabled: showExtendedFeed,
-    }
-  );
+    });
 
   // Effect to check the intersection observer to trigger fetching the next page
   useEffect(() => {
@@ -104,6 +106,12 @@ const ExtendedFeed: FC<ExtendedFeedProps> = ({
         </p>
       </div>
 
+      {/* Sort Toolbar */}
+      <FeedSortToolbar
+        currentOption={sortOption}
+        setSortOption={setSortOption}
+      />
+
       {/* Display of unique threads in the extended feed */}
       <ul className="flex flex-col col-span-2 sm:space-y-6 sm:mt-0 mb-6">
         {uniqueThreads.map((thread, index) => {
@@ -113,7 +121,7 @@ const ExtendedFeed: FC<ExtendedFeedProps> = ({
               thread={thread}
               length={length}
               index={index}
-              session={session}
+              userId={session?.user.id}
               ref={ref}
             />
           );
@@ -123,6 +131,13 @@ const ExtendedFeed: FC<ExtendedFeedProps> = ({
         {isFetchingNextPage && (
           <div className="flex justify-center">
             <Loader2 className="w-6 h-6 text-zinc-500 animate-spin" />
+          </div>
+        )}
+
+        {/* Loading indicator when starting a query for threads */}
+        {isFetching && !isFetchingNextPage && (
+          <div className="flex justify-center mt-2">
+            <Loader2 className="w-6 h-6 text-emerald-500 animate-spin" />
           </div>
         )}
       </ul>

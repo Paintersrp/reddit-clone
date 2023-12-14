@@ -6,7 +6,7 @@ import { buttonVariants } from "@/components/ui/Button";
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import SubscribeLeaveToggle from "@/components/layout/SubscribeLeaveToggle";
-import ToFeedButton from "@/components/ui/ToFeedButton";
+import ToFeedButton from "@/components/layout/ToFeedButton";
 
 const Layout = async ({
   children,

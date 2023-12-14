@@ -3,7 +3,7 @@ import "@/styles/globals.css";
 
 import { cn } from "@/lib/utils";
 import Providers from "@/components/layout/Providers";
-import Navbar from "@/components/ui/Navbar";
+import Navbar from "@/components/layout/Navbar";
 import { Toaster } from "@/components/ui/Toaster";
 
 export const metadata = {

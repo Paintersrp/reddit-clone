@@ -11,6 +11,7 @@ const FeedSortToolbar: FC<FeedSortToolbarProps> = ({
   currentOption,
   setSortOption,
 }) => {
+  // Array of items to be rendered in the toolbar
   const sortItems: { option: SortOptions; text: string }[] = [
     { option: "newest", text: "Newest" },
     { option: "oldest", text: "Oldest" },

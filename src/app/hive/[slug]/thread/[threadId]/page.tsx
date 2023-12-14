@@ -14,6 +14,7 @@ import VoteSkeleton from "@/components/vote/VoteSkeleton";
 import EditorOutput from "@/components/editor/EditorOutput";
 import Comments from "@/components/comments/Comments";
 import DeleteThreadDialog from "@/components/layout/DeleteThreadDialog";
+import Link from "next/link";
 
 interface PageProps {
   params: {
@@ -91,7 +92,13 @@ const Page = async ({ params }: PageProps) => {
             <div>
               <p className="max-h-40 mt-1 truncate text-xs sm:text-sm text-gray-500">
                 Created by u/
-                {thread?.author?.username ?? cachedThread.authorUsername} {"  "}
+                <Link
+                  href={`/user/${thread?.author?.username}`}
+                  className="text-blue-700 hover:underline"
+                >
+                  {thread?.author?.username ?? cachedThread.authorUsername}
+                </Link>
+                {"  "}
                 <span className="px-1">•</span>
                 {formatTimeToNow(
                   new Date(thread?.createdAt ?? cachedThread.createdAt)

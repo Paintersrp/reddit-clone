@@ -15,6 +15,7 @@ import {
 import { Avatar, AvatarFallback } from "../ui/Avatar";
 
 const GuestMenu: FC = () => {
+  // Setup router for navigation
   const router = useRouter();
 
   return (

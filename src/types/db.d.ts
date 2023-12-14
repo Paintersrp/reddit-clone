@@ -20,6 +20,15 @@ export type ExtendedComment = Comment & {
   author: User;
 };
 
+export type ExtendedCommentWithReplies = ExtendedComment & {
+  replies?: (CommentType & {
+    votes: CommentVote[];
+    author: User;
+    replyTo: CommentType | null;
+    replies: any;
+  })[];
+};
+
 export type JoinedThread = Thread & {
   author: User;
   votes: Vote[];

@@ -8,11 +8,13 @@ interface EditorOutputProps {
   content: any;
 }
 
+// Dynamic import to handle issues with SSR/NextJS
 const Output = dynamic(
   async () => (await import("editorjs-react-renderer")).default,
   { ssr: false }
 );
 
+// Custom render function for image blocks
 function ImageRenderer({ data }: any) {
   const src = data.file.url;
 
@@ -23,6 +25,7 @@ function ImageRenderer({ data }: any) {
   );
 }
 
+// Custom render function for code blocks
 function CodeRenderer({ data }: any) {
   return (
     <pre className="bg-gray-800 rounded-md p-4 overflow-hidden">
@@ -31,6 +34,7 @@ function CodeRenderer({ data }: any) {
   );
 }
 
+// Custom render function for paragraph blocks
 function ParagraphRenderer({ data }: any) {
   const paragraphs = data.text
     .split("\n")
@@ -43,6 +47,7 @@ function ParagraphRenderer({ data }: any) {
   return <div className="space-y-2">{paragraphs}</div>;
 }
 
+// Custom render function for header blocks
 function HeaderRenderer({ data }: any) {
   const Tag = `h${data.level}` as keyof JSX.IntrinsicElements;
 
@@ -62,6 +67,7 @@ function HeaderRenderer({ data }: any) {
   );
 }
 
+// Custom render function for list blocks
 function ListRenderer({ data }: any) {
   const isOrdered = data.style === "ordered";
   const ListTag = isOrdered ? "ol" : "ul";

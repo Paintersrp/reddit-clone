@@ -1,11 +1,12 @@
 "use client";
 
-import { Subhive, Thread } from "@prisma/client";
+import { Subhive, Thread, User } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 import { usePathname, useRouter } from "next/navigation";
 import { FC, useCallback, useEffect, useRef, useState } from "react";
-import { MessageSquareDashed, Users } from "lucide-react";
+import { MessageSquareDashed, User as UserIcon, Users } from "lucide-react";
 import debounce from "lodash.debounce";
+import Link from "next/link";
 import axios from "axios";
 
 import {
@@ -21,6 +22,7 @@ import { useOnClickOutside } from "@/hooks/use-on-click-outside";
 interface QueryResults {
   threads: (Thread & { subhive: Subhive })[];
   hives: Subhive[];
+  users: User[];
 }
 
 const SearchBar: FC = ({}) => {
@@ -95,7 +97,9 @@ const SearchBar: FC = ({}) => {
                   value={subhive.name}
                 >
                   <Users className="mr-2 h-4 w-4" />
-                  <a href={`/hive/${subhive.name}`}>hive/{subhive.name}</a>
+                  <Link href={`/hive/${subhive.name}`}>
+                    hive/{subhive.name}
+                  </Link>
                 </CommandItem>
               ))}
             </CommandGroup>
@@ -118,16 +122,35 @@ const SearchBar: FC = ({}) => {
                   <div className="w-full flex justify-between items-center">
                     <div className="flex">
                       <MessageSquareDashed className="mr-2 h-4 w-4" />
-                      <a
+                      <Link
                         href={`/hive/${thread.subhive.name}/thread/${thread.id}`}
                       >
                         {thread.title}
-                      </a>
+                      </Link>
                     </div>
                     <div className="text-xs text-gray-500">
                       <span>hive/{thread.subhive.name}</span>
                     </div>
                   </div>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          ) : null}
+
+          {/* User Search Results */}
+          {(queryResults?.users?.length ?? 0) > 0 ? (
+            <CommandGroup heading="Users">
+              {queryResults?.users?.map((user: User) => (
+                <CommandItem
+                  onSelect={(e) => {
+                    router.push(`/user/${e}`);
+                    router.refresh();
+                  }}
+                  key={user.id}
+                  value={user.username!}
+                >
+                  <UserIcon className="mr-2 h-4 w-4" />
+                  <Link href={`/user/${user.username}`}>u/{user.username}</Link>
                 </CommandItem>
               ))}
             </CommandGroup>
